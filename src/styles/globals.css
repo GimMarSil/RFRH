@@ -1,0 +1,270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+ 
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom styles can be added below */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Inputs e selects com sombra suave */
+input, textarea, select {
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 8px 0 rgba(180, 180, 180, 0.15);
+  padding: 8px 12px;
+  font-size: 1rem;
+  transition: box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 2px #b3b3b3;
+}
+
+/* Estilos de impressão */
+@media print {
+  header, .shadow, .rounded-lg, .rounded-xl, .bg-gray-100, .bg-white:not(#modal-ver-pedido), main {
+    display: none !important;
+  }
+  #modal-ver-pedido {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 99999 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    min-height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    overflow: visible !important;
+  }
+  header, footer, .print\:fixed {
+    position: fixed !important;
+    left: 0 !important; right: 0 !important;
+    background: #fff !important;
+    z-index: 9999 !important;
+  }
+  header, .print\:top-0 { top: 0 !important; }
+  footer, .print\:bottom-0 { bottom: 0 !important; }
+  .print\:w-full { width: 100vw !important; }
+  .print\:bg-white { background: #fff !important; }
+  .print\:border-t { border-top: 1px solid #ccc !important; }
+  .print\:px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
+  .print\:py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+  .print-page-break {
+    display: block !important;
+    page-break-before: always !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  .modal-print-header {
+    display: block !important;
+    position: fixed !important;
+    top: 0; left: 0; right: 0;
+    background: #fff !important;
+    z-index: 1000;
+    width: 100vw;
+  }
+  #modal-ver-pedido > .overflow-y-auto, #modal-ver-pedido > div.overflow-y-auto {
+    padding-top: 120px !important;
+  }
+  .pdf-page-break {
+    display: block;
+    page-break-before: always;
+    break-before: page;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  .pdf-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .pdf-header, .pdf-footer {
+    display: block !important;
+  }
+  .pdf-text {
+    font-size: 0.85em !important;
+  }
+}
+
+.pdf-header, .pdf-footer {
+  display: none;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Inputs e selects com sombra suave */
+input, textarea, select {
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 8px 0 rgba(180, 180, 180, 0.15);
+  padding: 8px 12px;
+  font-size: 1rem;
+  transition: box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 2px #b3b3b3;
+}
+
+/* Estilos de impressão */
+@media print {
+  header, .shadow, .rounded-lg, .rounded-xl, .bg-gray-100, .bg-white:not(#modal-ver-pedido), main {
+    display: none !important;
+  }
+  #modal-ver-pedido {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 99999 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    min-height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    overflow: visible !important;
+  }
+  header, footer, .print\:fixed {
+    position: fixed !important;
+    left: 0 !important; right: 0 !important;
+    background: #fff !important;
+    z-index: 9999 !important;
+  }
+  header, .print\:top-0 { top: 0 !important; }
+  footer, .print\:bottom-0 { bottom: 0 !important; }
+  .print\:w-full { width: 100vw !important; }
+  .print\:bg-white { background: #fff !important; }
+  .print\:border-t { border-top: 1px solid #ccc !important; }
+  .print\:px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
+  .print\:py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+  .print-page-break {
+    display: block !important;
+    page-break-before: always !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  .modal-print-header {
+    display: block !important;
+    position: fixed !important;
+    top: 0; left: 0; right: 0;
+    background: #fff !important;
+    z-index: 1000;
+    width: 100vw;
+  }
+  #modal-ver-pedido > .overflow-y-auto, #modal-ver-pedido > div.overflow-y-auto {
+    padding-top: 120px !important;
+  }
+} 

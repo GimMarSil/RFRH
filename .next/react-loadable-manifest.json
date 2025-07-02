@@ -1,0 +1,28 @@
+{
+  "..\\..\\node_modules\\@azure\\msal-browser\\dist\\telemetry\\BrowserPerformanceClient.mjs -> ./BrowserPerformanceMeasurement.mjs": {
+    "id": "..\\..\\node_modules\\@azure\\msal-browser\\dist\\telemetry\\BrowserPerformanceClient.mjs -> ./BrowserPerformanceMeasurement.mjs",
+    "files": []
+  },
+  "..\\..\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> canvg": {
+    "id": "..\\..\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> canvg",
+    "files": [
+      "static/chunks/node_modules_canvg_lib_index_es_js.js"
+    ]
+  },
+  "..\\..\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> dompurify": {
+    "id": "..\\..\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> dompurify",
+    "files": [
+      "static/chunks/node_modules_dompurify_dist_purify_es_mjs.js"
+    ]
+  },
+  "..\\..\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> html2canvas": {
+    "id": "..\\..\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> html2canvas",
+    "files": []
+  },
+  "recruitmentdashboard.tsx -> html2pdf.js": {
+    "id": "recruitmentdashboard.tsx -> html2pdf.js",
+    "files": [
+      "static/chunks/node_modules_html2pdf_js_dist_html2pdf_js.js"
+    ]
+  }
+}

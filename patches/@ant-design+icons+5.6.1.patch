@@ -1,0 +1,13 @@
+diff --git a/node_modules/@ant-design/icons/es/icons/CheckCircleFilled.js b/node_modules/@ant-design/icons/es/icons/CheckCircleFilled.js
+index 8a3e52e..7093bf7 100644
+--- a/node_modules/@ant-design/icons/es/icons/CheckCircleFilled.js
++++ b/node_modules/@ant-design/icons/es/icons/CheckCircleFilled.js
+@@ -3,7 +3,7 @@ import _extends from "@babel/runtime/helpers/esm/extends";
+ // DON NOT EDIT IT MANUALLY
+ 
+ import * as React from 'react';
+-import CheckCircleFilledSvg from "@ant-design/icons-svg/es/asn/CheckCircleFilled";
++import CheckCircleFilledSvg from "@ant-design/icons-svg/es/asn/CheckCircleFilled.js";
+ import AntdIcon from "../components/AntdIcon";
+ var CheckCircleFilled = function CheckCircleFilled(props, ref) {
+   return /*#__PURE__*/React.createElement(AntdIcon, _extends({}, props, {
