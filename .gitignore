@@ -316,3 +316,6 @@ local/
 # Cache directories
 .cache/
 .temp/ 
+
+node_modules/
+.next/
