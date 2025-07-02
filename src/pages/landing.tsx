@@ -22,7 +22,7 @@ const modules = [
   { name: 'Dossiers de Colaboradores', description: 'Dados, ausências, funções', icon: '📁', path: '#' }, // Example placeholder path
   { name: 'Candidaturas e Vagas', description: 'Vagas, triagem, entrevistas', icon: '📄', path: '/recruitmentdashboard' },
   { name: 'Integração de Novos Colaboradores', description: 'Checklists, feedback', icon: '🚀', path: '#' },
-  { name: 'Formação & Certificação', description: 'Planos, necessidades, certificados', icon: '🎓', path: '#' },
+  { name: 'Formação & Certificação', description: 'Planos, necessidades, certificados', icon: '🎓', path: '/training' },
   { name: 'Desempenho & Feedback', description: 'Avaliações periódicas, autoavaliações', icon: '📊', path: '/evaluation' },
   { name: 'Clima & Saída de Colaboradores', description: 'Satisfação, saída', icon: '😊', path: '#' },
   { name: 'Promoções e Transferências', description: 'Mobilidade interna', icon: '🧭', path: '#' },
