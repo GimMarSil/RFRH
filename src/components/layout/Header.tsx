@@ -2,9 +2,20 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import NotificationBell from '../evaluation/NotificationBell';
+import { useSelectedEmployee } from '@/contexts/SelectedEmployeeContext';
 
-export default function Header() {
+interface HeaderProps {
+  employees: { employee_number: number; Name: string }[];
+  onChange: (index: number) => void;
+  loading: boolean;
+}
+
+export default function Header({ employees, onChange, loading }: HeaderProps) {
   const router = useRouter();
+  const {
+    employeeProfileName,
+    selectedEmployeeId,
+  } = useSelectedEmployee();
 
   return (
     <header className="bg-white shadow">
@@ -49,7 +60,26 @@ export default function Header() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            {selectedEmployeeId && (
+              <span className="text-sm text-gray-700">
+                {employeeProfileName}
+              </span>
+            )}
+            {employees.length > 0 && (
+              <select
+                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                onChange={(e) => onChange(parseInt(e.target.value, 10))}
+                value={employees.findIndex(e => String(e.employee_number) === selectedEmployeeId)}
+              >
+                {employees.map((emp, idx) => (
+                  <option key={emp.employee_number} value={idx}>
+                    {emp.Name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {loading && <span className="text-sm text-gray-500">A carregar...</span>}
             <NotificationBell />
           </div>
         </div>

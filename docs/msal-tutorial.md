@@ -1,3 +1,8 @@
+# MSAL Tutorial
+
+The following guide was extracted from `src/authConfig.js`.
+```javascript
+
 
 
     import { LogLevel } from "@azure/msal-browser";
@@ -397,5 +402,4 @@
     SQL_DATABASE="RFWebApp"
 
     # Opcional: Se o seu SQL Server requer SSL mas não tem um certificado confiável (apenas para desenvolvimento)
-    # NODE_TLS_REJECT_UNAUTHORIZED=0
-    
+```

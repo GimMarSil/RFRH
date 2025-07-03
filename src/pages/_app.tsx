@@ -7,6 +7,7 @@ import { SelectedEmployeeProvider } from "@/contexts/SelectedEmployeeContext";
 import type { AppProps } from 'next/app';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import AppLayout from '@/components/layout/AppLayout';
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -15,8 +16,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     <MsalProvider instance={msalInstance}>
       <SelectedEmployeeProvider>
         <FuncionarioProvider>
-          <Component {...pageProps} />
-          <ToastContainer 
+          <AppLayout>
+            <Component {...pageProps} />
+          </AppLayout>
+          <ToastContainer
             position="top-right"
             autoClose={5000}
             hideProgressBar={false}
