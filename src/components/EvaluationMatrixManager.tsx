@@ -370,4 +370,4 @@ export const EvaluationMatrixManager: React.FC = () => {
       </Modal>
     </div>
   );
-}; 
+};

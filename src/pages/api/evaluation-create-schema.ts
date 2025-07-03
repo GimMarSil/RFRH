@@ -39,4 +39,4 @@ export default async function handler(req, res) {
   } finally {
     client.release();
   }
-} 
+}

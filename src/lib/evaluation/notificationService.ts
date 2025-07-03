@@ -145,4 +145,4 @@ export async function runNotificationChecks() {
     console.error('Error in notification checks:', error);
     throw error;
   }
-} 
+}

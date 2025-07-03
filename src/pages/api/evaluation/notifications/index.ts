@@ -68,4 +68,4 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
   }
 }
 
-export default withAuth(handler); 
+export default withAuth(handler);

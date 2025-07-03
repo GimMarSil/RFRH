@@ -65,4 +65,4 @@ export async function getDirectGraphSubordinates(userAzureAdId: string): Promise
     console.error(`getDirectGraphSubordinates: Error fetching direct reports for AAD user ${userAzureAdId}:`, error.message);
     return []; // Return empty array on error to allow checks like .length > 0 to fail gracefully
   }
-} 
+}
