@@ -11,6 +11,8 @@ export interface AuthenticatedRequest extends NextApiRequest {
     roles: string[];
     account?: AccountInfo;
   };
+  /** The employee profile ID validated against the authenticated user */
+  selectedEmployeeId?: string;
 }
 
 // MSAL configuration
@@ -361,11 +363,12 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: NextApiRespon
         console.log('[AuthMiddleware] Employee validation SUCCESSFUL.');
       }
 
-      // Attach user data to request
+      // Attach user data and selected employee to request
       req.user = {
         ...userData,
         account: await msalInstance.getActiveAccount(),
       };
+      req.selectedEmployeeId = selectedEmployeeId;
 
       // Call the handler
       await handler(req, res);
