@@ -632,7 +632,7 @@ export default function RecruitmentForm() {
               <div className="mt-2"><label className="block font-medium mb-1">Função a constar no cartão</label><input name="cardFunction" value={formData.cardFunction} onChange={handleChange} className="w-full border border-border rounded p-2 bg-background text-foreground" /></div>
             </div>
             <div>
-              <div className="flex items-center space-x-2"><input type="checkbox" name="epi" checked={formData.epi} onChange={handleChange} /> <span>EPI's</span></div>
+              <div className="flex items-center space-x-2"><input type="checkbox" name="epi" checked={formData.epi} onChange={handleChange} /> <span>EPI&apos;s</span></div>
               <div className="flex items-center space-x-2 mt-2"><input type="checkbox" name="workClothes" checked={formData.workClothes} onChange={handleChange} /> <span>Vestuário de Trabalho</span></div>
               <div className="mt-2"><label className="block font-medium mb-1">Outro(s)</label><input name="otherEquipment" value={formData.otherEquipment} onChange={handleChange} className="w-full border border-border rounded p-2 bg-background text-foreground" /></div>
             </div>

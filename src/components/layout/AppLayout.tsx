@@ -32,9 +32,25 @@ const AppLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
           const data: Employee[] = await res.json();
           setEmployees(data);
           if (!selectedEmployeeId) {
-            if (data.length === 1) {
-              setSelectedEmployeeId(String(data[0].employee_number));
-              setEmployeeProfileName(data[0].Name);
+            const accountId = accounts[0].localAccountId || accounts[0].username;
+            const historyKey = `employeeHistory_${accountId}`;
+            const historyRaw = localStorage.getItem(historyKey);
+            let chosen: Employee | undefined;
+            if (historyRaw) {
+              try {
+                const history: string[] = JSON.parse(historyRaw);
+                for (const id of history) {
+                  const emp = data.find(e => String(e.employee_number) === id);
+                  if (emp) { chosen = emp; break; }
+                }
+              } catch {}
+            }
+            if (!chosen && data.length > 0) {
+              chosen = data[0];
+            }
+            if (chosen) {
+              setSelectedEmployeeId(String(chosen.employee_number));
+              setEmployeeProfileName(chosen.Name);
             } else if (data.length > 1) {
               setShowSelectModal(true);
             }

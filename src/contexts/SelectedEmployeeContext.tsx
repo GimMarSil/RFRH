@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, PropsWithChildren } from 'react';
+import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { 
     InteractionStatus, 
     type AccountInfo, 
-    type IPublicClientApplication 
+    type IPublicClientApplication
 } from "@azure/msal-browser";
+import Cookies from 'js-cookie';
 
 interface SelectedEmployeeContextType {
   selectedEmployeeId: string | null;
@@ -32,11 +33,13 @@ export const SelectedEmployeeProvider: React.FC<PropsWithChildren<{}>> = ({ chil
   const [employeeProfileName, setEmployeeProfileNameState] = useState<string | null>(null);
   const [isManagerRole, setIsManagerRoleState] = useState<boolean>(false);
 
-  // Persistência em localStorage
+  // Persistência em cookie/localStorage
   useEffect(() => {
+    const cookieId = Cookies.get('selectedEmployeeId');
     const storedEmployeeId = localStorage.getItem('selectedEmployeeId');
-    if (storedEmployeeId && !selectedEmployeeId) {
-      setSelectedEmployeeIdState(storedEmployeeId);
+    const saved = cookieId || storedEmployeeId;
+    if (saved && !selectedEmployeeId) {
+      setSelectedEmployeeIdState(saved);
     }
   }, []);
 
@@ -45,8 +48,24 @@ export const SelectedEmployeeProvider: React.FC<PropsWithChildren<{}>> = ({ chil
     setSelectedEmployeeIdState(employeeId);
     if (employeeId) {
       localStorage.setItem('selectedEmployeeId', employeeId);
+      Cookies.set('selectedEmployeeId', employeeId, {
+        expires: 30,
+        secure: true,
+        sameSite: 'strict',
+      });
+
+      // update history
+      if (systemUserId) {
+        const key = `employeeHistory_${systemUserId}`;
+        const historyRaw = localStorage.getItem(key);
+        let history: string[] = historyRaw ? JSON.parse(historyRaw) : [];
+        history = [employeeId, ...history.filter(id => id !== employeeId)];
+        history = history.slice(0, 5);
+        localStorage.setItem(key, JSON.stringify(history));
+      }
     } else {
       localStorage.removeItem('selectedEmployeeId');
+      Cookies.remove('selectedEmployeeId');
     }
   };
 
