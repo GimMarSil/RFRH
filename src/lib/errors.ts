@@ -100,4 +100,4 @@ export function requireRole(roles: string[], userRoles: string[]): void {
       `Required role not found. Required: ${roles.join(', ')}`
     );
   }
-} 
+}

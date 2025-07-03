@@ -845,4 +845,4 @@ export default function CandidateManagementPage() {
       </main>
     </div>
   );
-} 
+}

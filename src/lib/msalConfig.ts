@@ -12,4 +12,4 @@ export const msalConfig = {
 export const cca = new msalNode.ConfidentialClientApplication(msalConfig);
 
 // Microsoft Graph API Scopes for Application Permissions
-export const GRAPH_SCOPES = ['https://graph.microsoft.com/.default']; 
+export const GRAPH_SCOPES = ['https://graph.microsoft.com/.default'];

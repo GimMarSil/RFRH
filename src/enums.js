@@ -69,4 +69,4 @@ export const SEGURO_SAUDE = [
   "Após 6 meses",
   "Apos 12 meses",
   "Não aplicavel"
-]; 
+];

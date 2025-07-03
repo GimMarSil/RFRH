@@ -152,4 +152,4 @@ export async function getEmployeeDetailsByNumber(number: string) {
     console.error('Error fetching employee data from SQL Server:', err);
     return null;
   }
-} 
+}

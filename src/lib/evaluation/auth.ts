@@ -375,4 +375,4 @@ export async function canManageMatrix(
   } finally {
     client.release();
   }
-} 
+}

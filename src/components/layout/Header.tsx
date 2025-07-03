@@ -86,4 +86,4 @@ export default function Header({ employees, onChange, loading }: HeaderProps) {
       </nav>
     </header>
   );
-} 
+}

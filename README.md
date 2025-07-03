@@ -26,5 +26,11 @@ The following variables are referenced in the code base:
 - `SQL_PASSWORD`
 - `SQL_SERVER`
 - `SQL_USER`
+- `DATABASE_URL`
 
-Configure these variables in your `.env.local` file before starting the application.
+Refer to that file when creating your own `.env.local`.
+
+## Employee Selection Flow
+
+After signing in, the app fetches the employees associated with the authenticated user. When there is more than one employee, a modal appears asking the user to choose which profile to use. The chosen employee ID is stored in `SelectedEmployeeContext` and persisted to local storage. All API calls include this ID in the `x-selected-employee-id` header so the backend can verify access.
+

@@ -1322,4 +1322,4 @@ function CheckboxField({ label, checked }) {
       <span className="text-xs">{label}</span>
     </div>
   );
-} 
+}

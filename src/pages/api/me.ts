@@ -6,4 +6,4 @@ export default function handler(req, res) {
     groups: ["0062979c-c927-4f32-876a-0a2bd0f28328"], // grupo RH
   };
   res.status(200).json(fakeUser);
-} 
+}
