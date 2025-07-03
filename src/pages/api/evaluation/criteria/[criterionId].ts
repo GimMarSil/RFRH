@@ -11,10 +11,23 @@ const pool = new Pool({
 
 // Helper to get authenticated user ID (replace with your actual auth logic)
 async function getAuthenticatedSystemUserId(req: AuthenticatedRequest): Promise<string | null> {
-  // TODO: Replace with actual MSAL or equivalent authentication logic
-  // This ID is the system-wide user identifier, used for audit trails (e.g., created_by_user_id)
-  console.warn('Using placeholder system user ID for audit logs in individual criterion API. Integrate actual authentication.');
-  return 'system-placeholder-user-id'; // Example: MSAL Object ID
+  const authHeader = req.headers.authorization;
+
+  if (req.user && typeof req.user.id === 'string') {
+    return req.user.id;
+  }
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
+    } catch (err) {
+      console.error('Failed to decode authorization token', err);
+    }
+  }
+
+  return null;
 }
 
 // Helper to get the selected Employee ID (e.g., from a custom header or session)

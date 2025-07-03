@@ -33,9 +33,24 @@ async function setUserForSession(client, userId) {
 // }
 
 async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string | null> {
-  // TODO: Replace with actual MSAL or equivalent authentication logic
-  console.warn('Using placeholder system user ID for audit logs in evaluation matrices API. Integrate actual authentication.');
-  return 'system-placeholder-user-id';
+  const authHeader = req.headers.authorization;
+
+  const user = (req as any).user;
+  if (user && typeof user.id === 'string') {
+    return user.id;
+  }
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
+    } catch (err) {
+      console.error('Failed to decode authorization token', err);
+    }
+  }
+
+  return null;
 }
 
 async function getSelectedEmployeeId(req: NextApiRequest): Promise<string | null> {

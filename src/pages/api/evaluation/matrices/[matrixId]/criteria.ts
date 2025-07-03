@@ -9,9 +9,24 @@ const pool = new Pool({
 
 // Renamed: Helper to get the actual logged-in system user ID (e.g., from MSAL)
 async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string | null> {
-  // TODO: Replace with your ACTUAL MSAL token validation and user ID extraction.
-  console.warn('MATRIX_CRITERIA_API: Using placeholder system User ID. Integrate actual MSAL authentication.');
-  return 'logged-in-system-user-via-msal'; 
+  const authHeader = req.headers.authorization;
+
+  const user = (req as any).user;
+  if (user && typeof user.id === 'string') {
+    return user.id;
+  }
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
+    } catch (err) {
+      console.error('Failed to decode authorization token', err);
+    }
+  }
+
+  return null;
 }
 
 // Helper to get the Employee ID the user is currently acting as (selected on landing)
