@@ -61,8 +61,13 @@ export async function fetchWithAuth<T = any>(
     logger.error(`[apiClient] Silent token acquisition failed for ${apiUrl}:`, error);
     if (error instanceof InteractionRequiredAuthError) {
       logger.log(`[apiClient] Interaction required for ${apiUrl}. Depending on app flow, redirect/popup should be invoked.`);
-      // msalInstance.acquireTokenRedirect(request); // Or acquireTokenPopup
-      // For now, let API call fail to indicate an issue with interaction handling.
+      try {
+        tokenResponse = await msalInstance.acquireTokenSilent(request);
+      } catch (e) {
+        logger.error('[apiClient] Silent retry failed, redirecting user');
+        msalInstance.acquireTokenRedirect(request).catch(err => logger.error('Redirect for token failed', err));
+        throw e;
+      }
     }
     // If acquireTokenSilent fails for other reasons, tokenResponse will be undefined and handled below.
   }
@@ -94,10 +99,25 @@ export async function fetchWithAuth<T = any>(
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''; // e.g., http://localhost:3000
 
   try {
-    const response = await fetch(`${apiBaseUrl}${apiUrl}`, {
+    let response = await fetch(`${apiBaseUrl}${apiUrl}`, {
       ...requestOptions,
       headers,
     });
+
+    if (response.status === 401) {
+      logger.warn(`[apiClient] 401 for ${apiUrl}. Attempting token refresh.`);
+      try {
+        tokenResponse = await msalInstance.acquireTokenSilent(request);
+        headers.set('Authorization', `Bearer ${tokenResponse.accessToken}`);
+        response = await fetch(`${apiBaseUrl}${apiUrl}`, {
+          ...requestOptions,
+          headers,
+        });
+      } catch (refreshError) {
+        logger.error('[apiClient] Token refresh failed', refreshError);
+        throw refreshError;
+      }
+    }
 
     if (apiUrl.includes('activeMatrixCheck')) {
       logger.log(`[apiClient] Response status for activeMatrixCheck (${apiUrl}): ${response.status}`);
