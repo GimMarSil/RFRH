@@ -1,5 +1,6 @@
 # Auth Config Tutorial
 
+For environment setup and running the application see **README.md** at the project root.
 
 
     import { LogLevel } from "@azure/msal-browser";

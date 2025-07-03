@@ -1,5 +1,7 @@
 # MSAL Tutorial
 
+For environment variables and project setup see **README.md** at the project root.
+
 The following guide was extracted from `src/authConfig.js`.
 ```javascript
 
