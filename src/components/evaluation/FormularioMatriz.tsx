@@ -32,7 +32,7 @@ interface Subordinate {
   name: string;
 }
 
-interface MatrixFormProps {
+interface FormularioMatrizProps {
   matrix?: EvaluationMatrix | null; // For editing existing matrix
   onClose: () => void;
   onSave: (data: EvaluationMatrix) => Promise<void>; // Make onSave async to handle API calls
@@ -48,7 +48,7 @@ const defaultCriterion: EvaluationCriterion = {
   is_cutting: false,
 };
 
-const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subordinatesList, selectedApplicableEmployeeIds, onSelectedApplicableEmployeesChange }) => {
+const FormularioMatriz: React.FC<FormularioMatrizProps> = ({ matrix, onClose, onSave, subordinatesList, selectedApplicableEmployeeIds, onSelectedApplicableEmployeesChange }) => {
   const [subordinatesWithActiveMatrix, setSubordinatesWithActiveMatrix] = useState<string[]>([]);
   const {
     msalInstance,
@@ -101,7 +101,7 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
     const fetchActiveMatrixForSubs = async () => {
       if (!subordinatesList || subordinatesList.length === 0) return;
       if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None || !currentSelectedEmployeeId) {
-        console.warn('[MatrixForm] fetchActiveMatrixForSubs: MSAL context not ready or no selected employee ID.');
+        console.warn('[FormularioMatriz] fetchActiveMatrixForSubs: MSAL context not ready or no selected employee ID.');
         return;
       }
 
@@ -116,7 +116,7 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
           selectedEmployeeId: currentSelectedEmployeeId,
         };
         const data = await fetchWithAuth<{ activeEmployeeIds?: string[] }>(
-          `/api/evaluation-matrices?activeMatrixCheck=${ids.join(',')}`,
+          `/api/matrizes-avaliacao?activeMatrixCheck=${ids.join(',')}`,
           { method: 'GET' },
           apiClientOpts
         );
@@ -187,9 +187,9 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
       // onClose(); // onSave in parent (handleSaveMatrix) already handles closing modal and fetching matrices
     } catch (error) { 
       // Error handling is done in handleSaveMatrix, which uses toast.error(err.message)
-      // If MatrixForm needs its own specific error display beyond what onSave does, add it here.
+      // If FormularioMatriz needs its own specific error display beyond what onSave does, add it here.
       // For now, assume onSave's error handling is sufficient.
-      console.error("[MatrixForm] onSubmit: Error during onSave call:", error);
+      console.error("[FormularioMatriz] onSubmit: Error during onSave call:", error);
       // message.error("Falha ao salvar a matriz a partir do formulário."); // Avoid double toasting if onSave also toasts
     }
   };
@@ -403,4 +403,4 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
   );
 };
 
-export default MatrixForm; 
+export default FormularioMatriz; 

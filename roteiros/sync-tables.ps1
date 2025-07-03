@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 Write-Host "Starting table synchronization..."
 
 try {
-    $response = Invoke-RestMethod -Uri "http://localhost:3000/api/evaluation/create-table" -Method Post -Body "{}" -ContentType "application/json"
+    $response = Invoke-RestMethod -Uri "http://localhost:3000/api/avaliacao/criar-tabela" -Method Post -Body "{}" -ContentType "application/json"
     Write-Host "Tables synchronized successfully!"
 } catch {
     Write-Host "Error: Failed to sync tables"

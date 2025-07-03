@@ -45,7 +45,7 @@ interface Employee {
   department: string;
 }
 
-export const EvaluationMatrixManager: React.FC = () => {
+export const GestorMatrizAvaliacao: React.FC = () => {
   const [matrices, setMatrices] = useState<Matrix[]>([]);
   const [applicabilities, setApplicabilities] = useState<MatrixApplicability[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -64,7 +64,7 @@ export const EvaluationMatrixManager: React.FC = () => {
   const fetchMatrices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/evaluation-matrices');
+      const response = await fetch('/api/matrizes-avaliacao');
       const data = await response.json();
       setMatrices(data);
     } catch (error) {
@@ -87,7 +87,7 @@ export const EvaluationMatrixManager: React.FC = () => {
   const fetchApplicabilities = async (matrixId: number) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/evaluation-matrices/${matrixId}/applicability`);
+      const response = await fetch(`/api/matrizes-avaliacao/${matrixId}/applicability`);
       const data = await response.json();
       setApplicabilities(data);
     } catch (error) {
@@ -100,7 +100,7 @@ export const EvaluationMatrixManager: React.FC = () => {
   const handleApplyMatrix = async (values: any) => {
     try {
       setLoading(true);
-      const response = await fetch('/api/evaluation/matrix/apply', {
+      const response = await fetch('/api/matriz-avaliacao/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -130,7 +130,7 @@ export const EvaluationMatrixManager: React.FC = () => {
   const handleCopyMatrix = async (values: any) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/evaluation/matrix/${selectedMatrix?.id}/copy`, {
+      const response = await fetch(`/api/matriz-avaliacao/${selectedMatrix?.id}/copy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

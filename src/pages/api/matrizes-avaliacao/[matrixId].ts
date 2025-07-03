@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { withAuth, AuthenticatedRequest, isAdmin, getUserDirectReports } from '../../../middleware/auth';
-import { validateMatrixInput } from '../../../lib/evaluation/validation';
+import { validateMatrixInput } from '../../../lib/avaliacao/validation';
 import { validate as validateUUID } from 'uuid';
 
 const pool = new Pool({
@@ -295,7 +295,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
     if (client) {
       await client.query('ROLLBACK');
     }
-    console.error(`Error in /api/evaluation-matrices/${matrixId} API:`, error);
+    console.error(`Error in /api/matrizes-avaliacao/${matrixId} API:`, error);
     if (error.code === '23503') { // foreign key violation
         res.status(409).json({ message: 'Conflict: Operation violates data integrity. The matrix might be in use.', details: error.detail });
     } else {

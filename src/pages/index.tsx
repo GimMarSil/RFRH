@@ -68,7 +68,7 @@ export default function Home() {
               <p className="font-normal text-gray-600">Gerenciar processos de recrutamento.</p>
             </div>
 
-            <Link href="/evaluation/matrices" legacyBehavior>
+            <Link href="/avaliacao/matrices" legacyBehavior>
               <a className="block p-6 bg-blue-50 border border-blue-200 rounded-lg shadow hover:bg-blue-100">
                 <h5 className="mb-2 text-xl font-bold tracking-tight text-blue-700">Avaliação de Desempenho</h5>
                 <p className="font-normal text-gray-600">Gerenciar matrizes, F-RH-04 e avaliações.</p>

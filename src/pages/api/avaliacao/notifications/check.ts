@@ -1,6 +1,6 @@
 import { NextApiResponse } from 'next';
 import { withAuth, AuthenticatedRequest, isAdmin } from '../../../middleware/auth';
-import { runNotificationChecks } from '../../../lib/evaluation/notificationService';
+import { runNotificationChecks } from '../../../lib/avaliacao/notificationService';
 
 async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'POST') {

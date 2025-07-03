@@ -78,7 +78,7 @@ const EvaluationFormPage = () => {
         // 3. Fetch any existing self_evaluation scores and manager_evaluation scores.
         // 4. Get subordinate's name/details.
         const fetchedData = await fetchWithAuth<SubordinateEvaluationData>(
-          `/api/evaluation/form-data/${subordinateId}`, // Placeholder API endpoint
+          `/api/avaliacao/form-data/${subordinateId}`, // Placeholder API endpoint
           { method: 'GET' }, // Potentially POST if it needs to initiate an evaluation record
           apiClientOptions
         );
@@ -113,7 +113,7 @@ const EvaluationFormPage = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Formulário de Avaliação</h1>
         <p className="text-red-500">Erro: {error}</p>
-        <Link href="/evaluation/evaluate" className="text-blue-500 hover:underline">
+        <Link href="/avaliacao/evaluate" className="text-blue-500 hover:underline">
           Voltar à seleção de colaborador
         </Link>
       </div>
@@ -125,7 +125,7 @@ const EvaluationFormPage = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Formulário de Avaliação</h1>
         <p>Não foram encontrados dados para esta avaliação.</p>
-        <Link href="/evaluation/evaluate" className="text-blue-500 hover:underline">
+        <Link href="/avaliacao/evaluate" className="text-blue-500 hover:underline">
           Voltar à seleção de colaborador
         </Link>
       </div>
@@ -137,7 +137,7 @@ const EvaluationFormPage = () => {
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <header className="mb-8">
-          <Link href="/evaluation/evaluate" className="text-blue-600 hover:text-blue-800 text-sm">
+          <Link href="/avaliacao/evaluate" className="text-blue-600 hover:text-blue-800 text-sm">
             &larr; Voltar à Seleção de Colaborador
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">

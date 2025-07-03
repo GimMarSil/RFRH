@@ -37,7 +37,7 @@ const EvaluationDashboardPage = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Avaliação de Desempenho</h1>
           <div className="flex space-x-3">
-            <Link href="/evaluation/matrices" legacyBehavior>
+            <Link href="/avaliacao/matrices" legacyBehavior>
               <a className="bg-white text-gray-700 hover:bg-gray-100 border border-gray-300 px-4 py-2 rounded-md shadow-sm text-sm font-medium flex items-center">
                 <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2 text-gray-500" />
                 Matrizes de Avaliação
@@ -120,12 +120,12 @@ const EvaluationDashboardPage = () => {
               <h2 className="text-xl font-semibold text-gray-700 mb-1">Ações do Gestor</h2>
               <p className="text-sm text-gray-500 mb-6">Gerencie as avaliações dos seus subordinados.</p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                <Link href="/evaluation/evaluate" legacyBehavior>
+                <Link href="/avaliacao/evaluate" legacyBehavior>
                   <a className="w-full sm:w-auto flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                     Avaliar Colaboradores
                   </a>
                 </Link>
-                <Link href="/evaluation/matrices" legacyBehavior>
+                <Link href="/avaliacao/matrices" legacyBehavior>
                   <a className="w-full sm:w-auto flex-1 bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
                     Nova Matriz de Avaliação
                   </a>

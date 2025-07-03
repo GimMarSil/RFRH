@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
-import { canAccessMatrix, canManageMatrix } from '../../../../lib/evaluation/auth';
-import { validateMatrixInput } from '../../../../lib/evaluation/validation';
+import { canAccessMatrix, canManageMatrix } from '../../../../lib/avaliacao/auth';
+import { validateMatrixInput } from '../../../../lib/avaliacao/validation';
 import { withAuth, AuthenticatedRequest, isAdmin, isManager } from '../../../../middleware/auth';
 
 const pool = new Pool({

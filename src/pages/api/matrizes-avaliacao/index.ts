@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllActiveEmployees, getEmployeeDetailsByUserId, getEmployeeDetailsByNumber } from '../../../lib/employeeDbService';
 import { withAuth, AuthenticatedRequest, isAdmin, isManager, getUserDirectReports } from '../../../middleware/auth';
-import { validateMatrixInput } from '../../../lib/evaluation/validation';
+import { validateMatrixInput } from '../../../lib/avaliacao/validation';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

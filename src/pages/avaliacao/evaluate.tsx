@@ -69,7 +69,7 @@ const EvaluateSubordinatePage = () => {
         // No need to acquire token manually, fetchWithAuth handles it.
         console.log("Fetching user role info...");
         const data = await fetchWithAuth<UserRoleInfo>(
-          '/api/evaluation/user-role-info',
+          '/api/avaliacao/user-role-info',
           { method: 'GET' },
           apiClientOptions
         );
@@ -114,7 +114,7 @@ const EvaluateSubordinatePage = () => {
   const handleProceedToEvaluation = () => {
     if (selectedSubordinate) {
       // The contextSelectedEmployeeId (manager's own employeeId) is implicitly used by API calls on the next page via fetchWithAuth
-      router.push(`/evaluation/evaluate/${selectedSubordinate}`);
+      router.push(`/avaliacao/evaluate/${selectedSubordinate}`);
     } else {
       alert('Por favor, selecione um colaborador.');
     }
@@ -134,7 +134,7 @@ const EvaluateSubordinatePage = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Avaliar Colaborador</h1>
         <p className="text-red-500">Erro: {error}</p>
-        <Link href="/evaluation" className="text-blue-500 hover:underline">
+        <Link href="/avaliacao" className="text-blue-500 hover:underline">
           Voltar ao Dashboard de Avaliação
         </Link>
       </div>
@@ -148,7 +148,7 @@ const EvaluateSubordinatePage = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Avaliar Colaborador</h1>
         <p>Não foi possível obter a informação do utilizador. Verifique se está autenticado.</p>
-        <Link href="/evaluation" className="text-blue-500 hover:underline">
+        <Link href="/avaliacao" className="text-blue-500 hover:underline">
           Voltar ao Dashboard de Avaliação
         </Link>
       </div>
@@ -165,7 +165,7 @@ const EvaluateSubordinatePage = () => {
           Você não tem colaboradores diretos para avaliar ou não tem permissões de gestor.
         </p>
         <div className="mt-6">
-          <Link href="/evaluation" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+          <Link href="/avaliacao" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
             Voltar ao Dashboard
           </Link>
         </div>
@@ -177,7 +177,7 @@ const EvaluateSubordinatePage = () => {
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <header className="mb-8">
-          <Link href="/evaluation" className="text-blue-600 hover:text-blue-800 text-sm">
+          <Link href="/avaliacao" className="text-blue-600 hover:text-blue-800 text-sm">
             &larr; Voltar ao Dashboard de Avaliação
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Selecionar Colaborador para Avaliação</h1>

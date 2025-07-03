@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { withAuth, AuthenticatedRequest, isAdmin, isManager } from '../../../../middleware/auth';
-import { validateMatrixInput } from '../../../../lib/evaluation/validation';
+import { validateMatrixInput } from '../../../../lib/avaliacao/validation';
 
 // TODO: Ideally, use a shared DB pool module
 const pool = new Pool({

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
-import { canManageMatrix } from '../../../../lib/evaluation/auth';
-import { validateMatrixInput } from '../../../../lib/evaluation/validation';
+import { canManageMatrix } from '../../../../lib/avaliacao/auth';
+import { validateMatrixInput } from '../../../../lib/avaliacao/validation';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

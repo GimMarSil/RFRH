@@ -16,7 +16,7 @@ interface Notification {
   };
 }
 
-export default function NotificationBell() {
+export default function SinoNotificacoes() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function NotificationBell() {
   const fetchNotifications = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/evaluation/notifications');
+      const response = await fetch('/api/avaliacao/notifications');
       if (!response.ok) {
         throw new Error('Failed to fetch notifications');
       }
@@ -47,7 +47,7 @@ export default function NotificationBell() {
   const handleNotificationClick = async (notification: Notification) => {
     try {
       // Mark notification as read
-      await fetch('/api/evaluation/notifications', {
+      await fetch('/api/avaliacao/notifications', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -58,11 +58,11 @@ export default function NotificationBell() {
       // Navigate to the appropriate page based on notification type
       if (notification.metadata) {
         if (notification.metadata.evaluation_id) {
-          router.push(`/evaluation/evaluations/${notification.metadata.evaluation_id}`);
+          router.push(`/avaliacao/evaluations/${notification.metadata.evaluation_id}`);
         } else if (notification.metadata.self_evaluation_id) {
-          router.push(`/evaluation/self-evaluations/${notification.metadata.self_evaluation_id}`);
+          router.push(`/avaliacao/self-evaluations/${notification.metadata.self_evaluation_id}`);
         } else if (notification.metadata.matrix_id) {
-          router.push(`/evaluation/matrices/${notification.metadata.matrix_id}`);
+          router.push(`/avaliacao/matrices/${notification.metadata.matrix_id}`);
         }
       }
 
@@ -94,13 +94,13 @@ export default function NotificationBell() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50">
           <div className="p-4 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Notificações</h3>
           </div>
           <div className="max-h-96 overflow-y-auto">
             {isLoading ? (
-              <div className="p-4 text-center text-gray-500">Loading...</div>
+              <div className="p-4 text-center text-gray-500">A carregar...</div>
             ) : notifications.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">No notifications</div>
+              <div className="p-4 text-center text-gray-500">Sem notificações</div>
             ) : (
               notifications.map((notification) => (
                 <button

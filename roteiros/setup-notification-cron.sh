@@ -17,7 +17,7 @@ TEMP_CRON=$(mktemp)
 crontab -l > "$TEMP_CRON" 2>/dev/null || echo "# Notification cron jobs" > "$TEMP_CRON"
 
 # Add the notification check job (runs daily at 9 AM)
-echo "0 9 * * * curl -X POST http://localhost:3000/api/evaluation/notifications/check -H 'Content-Type: application/json' -H 'Authorization: Bearer YOUR_ADMIN_TOKEN'" >> "$TEMP_CRON"
+echo "0 9 * * * curl -X POST http://localhost:3000/api/avaliacao/notifications/check -H 'Content-Type: application/json' -H 'Authorization: Bearer YOUR_ADMIN_TOKEN'" >> "$TEMP_CRON"
 
 # Install the new crontab
 crontab "$TEMP_CRON"

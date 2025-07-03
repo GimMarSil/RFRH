@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import NotificationBell from '../evaluation/NotificationBell';
+import SinoNotificacoes from '../evaluation/SinoNotificacoes';
 import { useSelectedEmployee } from '@/contexts/SelectedEmployeeContext';
 
 interface HeaderProps {
@@ -29,9 +29,9 @@ export default function Header({ employees, onChange, loading }: HeaderProps) {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
-                href="/evaluation/matrices"
+                href="/avaliacao/matrices"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  router.pathname.startsWith('/evaluation/matrices')
+                  router.pathname.startsWith('/avaliacao/matrices')
                     ? 'border-indigo-500 text-gray-900'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
@@ -39,9 +39,9 @@ export default function Header({ employees, onChange, loading }: HeaderProps) {
                 Matrices
               </Link>
               <Link
-                href="/evaluation/evaluations"
+                href="/avaliacao/evaluations"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  router.pathname.startsWith('/evaluation/evaluations')
+                  router.pathname.startsWith('/avaliacao/evaluations')
                     ? 'border-indigo-500 text-gray-900'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
@@ -49,9 +49,9 @@ export default function Header({ employees, onChange, loading }: HeaderProps) {
                 Evaluations
               </Link>
               <Link
-                href="/evaluation/self-evaluations"
+                href="/avaliacao/self-evaluations"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  router.pathname.startsWith('/evaluation/self-evaluations')
+                  router.pathname.startsWith('/avaliacao/self-evaluations')
                     ? 'border-indigo-500 text-gray-900'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
@@ -80,7 +80,7 @@ export default function Header({ employees, onChange, loading }: HeaderProps) {
               </select>
             )}
             {loading && <span className="text-sm text-gray-500">A carregar...</span>}
-            <NotificationBell />
+            <SinoNotificacoes />
           </div>
         </div>
       </nav>

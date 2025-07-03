@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
-import { canAccessMatrix, canManageMatrix } from '../../../../../lib/evaluation/auth';
+import { canAccessMatrix, canManageMatrix } from '../../../../../lib/avaliacao/auth';
 import { z } from 'zod';
 
 const pool = new Pool({

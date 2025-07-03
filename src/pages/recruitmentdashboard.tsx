@@ -720,7 +720,7 @@ export default function RecruitmentDashboard() {
               <TabButton href="/admissao" currentPath={router.pathname}>Admissão</TabButton>
               <TabButton href="/mobilidade" currentPath={router.pathname}>Mobilidade</TabButton>
               <TabButton href="/cessacoes" currentPath={router.pathname}>Cessações</TabButton>
-              <TabButton href="/evaluation" currentPath={router.pathname}>Avaliações</TabButton>
+              <TabButton href="/avaliacao" currentPath={router.pathname}>Avaliações</TabButton>
             </div>
           </div>
         </div>

@@ -23,7 +23,7 @@ const modules = [
   { name: 'Candidaturas e Vagas', description: 'Vagas, triagem, entrevistas', icon: '📄', path: '/recruitmentdashboard' },
   { name: 'Integração de Novos Colaboradores', description: 'Checklists, feedback', icon: '🚀', path: '#' },
   { name: 'Formação & Certificação', description: 'Planos, necessidades, certificados', icon: '🎓', path: '#' },
-  { name: 'Desempenho & Feedback', description: 'Avaliações periódicas, autoavaliações', icon: '📊', path: '/evaluation' },
+  { name: 'Desempenho & Feedback', description: 'Avaliações periódicas, autoavaliações', icon: '📊', path: '/avaliacao' },
   { name: 'Clima & Saída de Colaboradores', description: 'Satisfação, saída', icon: '😊', path: '#' },
   { name: 'Promoções e Transferências', description: 'Mobilidade interna', icon: '🧭', path: '#' },
   { name: 'Estágios', description: 'Plano, acompanhamento e avaliação', icon: '🎓', path: '#' }, // Note: same icon as Formação

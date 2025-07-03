@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import Head from 'next/head';
-import MatrixForm from '../../components/evaluation/MatrixForm'; // Adjusted path
+import FormularioMatriz from '../../components/evaluation/FormularioMatriz'; // Adjusted path
 import { toast } from 'react-toastify';
 import { PlusIcon, PencilSquareIcon, DocumentDuplicateIcon, TrashIcon, CalendarDaysIcon, ClipboardDocumentListIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useSelectedEmployee } from '../../contexts/SelectedEmployeeContext'; // Added
@@ -158,7 +158,7 @@ export default function EvaluationMatricesPage() {
       };
 
       const data = await fetchWithAuth<EvaluationMatrix[]>(
-        '/api/evaluation-matrices',
+        '/api/matrizes-avaliacao',
         { method: 'GET' },
         apiClientOpts
       );
@@ -191,7 +191,7 @@ export default function EvaluationMatricesPage() {
             selectedEmployeeId,
           };
           const roleInfo = await fetchWithAuth<any>( 
-            '/api/evaluation/user-role-info', 
+            '/api/avaliacao/user-role-info',
             { method: 'GET' },
             apiClientOpts
           );
@@ -258,13 +258,13 @@ export default function EvaluationMatricesPage() {
   }, [msalInstance, accounts, inProgress, selectedEmployeeId]); // Re-fetch if context changes
 
   useEffect(() => {
-    // Fallback: se não houver selectedEmployeeId, redireciona para /evaluation
+    // Fallback: se não houver selectedEmployeeId, redireciona para /avaliacao
     if (!selectedEmployeeId && !isLoading) {
-      router.replace('/evaluation');
+      router.replace('/avaliacao');
     }
   }, [selectedEmployeeId, isLoading, router]);
 
-  const handleOpenNewMatrixForm = () => {
+  const handleOpenNewFormularioMatriz = () => {
     setEditingMatrix(null);
     setSelectedApplicableEmployees([]); // Clear selections for new form
     setShowFormModal(true);
@@ -320,11 +320,11 @@ export default function EvaluationMatricesPage() {
         activeAccount,
         selectedEmployeeId,
       };
-      // Assuming an endpoint like /api/evaluation/matrices/{matrixId}/applicability
+      // Assuming an endpoint like /api/matrizes-avaliacao/{matrixId}/applicability
       // This endpoint needs to be created if it doesn't exist.
       // For now, this is a placeholder structure.
       // Replace with actual API call if available, or adjust logic.
-      // const data = await fetchWithAuth<string[]>(`/api/evaluation/matrices/${matrixId}/applicability`, { method: 'GET' }, apiClientOpts);
+      // const data = await fetchWithAuth<string[]>(`/api/matrizes-avaliacao/${matrixId}/applicability`, { method: 'GET' }, apiClientOpts);
       // return data;
       
       // Placeholder: If the matrix object itself contains applicability from the main fetch, use that.
@@ -358,7 +358,7 @@ export default function EvaluationMatricesPage() {
       return;
     }
 
-    const url = matrixId ? `/api/evaluation-matrices/${matrixId}` : '/api/evaluation-matrices';
+    const url = matrixId ? `/api/matrizes-avaliacao/${matrixId}` : '/api/matrizes-avaliacao';
     const method = matrixId ? 'PUT' : 'POST';
 
     const processedData = {
@@ -432,7 +432,7 @@ export default function EvaluationMatricesPage() {
         selectedEmployeeId,
       };
       await fetchWithAuth(
-        `/api/evaluation-matrices/${matrixIdToDelete}`, 
+        `/api/matrizes-avaliacao/${matrixIdToDelete}`,
         { method: 'DELETE' },
         apiClientOpts
       );
@@ -496,7 +496,7 @@ export default function EvaluationMatricesPage() {
         selectedEmployeeId,
       };
       await fetchWithAuth(
-        '/api/evaluation-matrices', 
+        '/api/matrizes-avaliacao',
         { 
           method: 'POST', 
           headers: { 'Content-Type': 'application/json' }, 
@@ -533,7 +533,7 @@ export default function EvaluationMatricesPage() {
         activeAccount,
         selectedEmployeeId,
       };
-      const data = await fetchWithAuth<Applicability[]>(`/api/evaluation-matrices/${matrixIdToShow}/applicability`, { method: 'GET' }, apiClientOpts);
+      const data = await fetchWithAuth<Applicability[]>(`/api/matrizes-avaliacao/${matrixIdToShow}/applicability`, { method: 'GET' }, apiClientOpts);
       setApplications(data);
     } catch (err: any) {
       toast.error('Erro ao buscar aplicações da matriz.');
@@ -557,7 +557,7 @@ export default function EvaluationMatricesPage() {
   const confirmInactivateApplicability = async () => {
     if (!confirmInactivate.app) return;
     try {
-      const response = await fetch(`/api/evaluation-matrix/applicability/${confirmInactivate.app.id}`, {
+      const response = await fetch(`/api/matriz-avaliacao/applicability/${confirmInactivate.app.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -591,7 +591,7 @@ export default function EvaluationMatricesPage() {
 
   const handleSubmitApplyMatrix = async (values: {employeeIds: string[], validFrom: string, validTo: string}) => {
     try {
-      const response = await fetch('/api/evaluation/matrix/apply', {
+      const response = await fetch('/api/matriz-avaliacao/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -638,7 +638,7 @@ export default function EvaluationMatricesPage() {
           <h1 className="text-3xl font-bold text-gray-800">Matrizes de Avaliação</h1>
           {selectedEmployeeId && isManager && subordinates && subordinates.length > 0 && (
             <button 
-              onClick={handleOpenNewMatrixForm}
+              onClick={handleOpenNewFormularioMatriz}
               className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition duration-150 flex items-center"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
@@ -752,7 +752,7 @@ export default function EvaluationMatricesPage() {
         </div>
 
         {showFormModal && (
-          <MatrixForm 
+          <FormularioMatriz 
             matrix={editingMatrix}
             onClose={() => {
               setShowFormModal(false);
