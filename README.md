@@ -27,7 +27,8 @@ The following variables are referenced in the code base:
 - `SQL_SERVER`
 - `SQL_USER`
 
-Refer to that file when creating your own `.env.local`.
+Refer to that file when creating your own `.env.local`. You can also run
+`npm run setup-env` to copy the example file automatically.
 
 ## Employee Selection Flow
 
