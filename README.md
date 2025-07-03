@@ -1,37 +1,31 @@
-# RFRH Portal
+# RFRH
 
-## Project Overview
+This project requires a number of environment variables to run locally. Copy `.env.local.example` to `.env.local` and fill in the values for your environment.
 
-RFRH is a Next.js application used to manage recruitment and employee evaluations. Authentication is handled through Microsoft Azure Active Directory using MSAL. Data about employees and evaluations is stored in a SQL Server database.
+## Required variables
 
-## Getting Started
+The following variables are referenced in the code base:
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Copy `.env.local.example` to `.env.local` and fill in the required variables.
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-The application will start on `http://localhost:3000` by default.
-
-### Environment Variables
-
-The example file `.env.local.example` lists all configuration values used by the project:
-
-- `NEXT_PUBLIC_AZURE_CLIENT_ID`
-- `NEXT_PUBLIC_AZURE_AUTHORITY`
-- `NEXT_PUBLIC_REDIRECT_URI`
+- `AZURE_AD_API_AUDIENCE`
 - `AZURE_AD_CLIENT_ID`
 - `AZURE_AD_CLIENT_SECRET`
+- `AZURE_AD_GRAPH_SCOPE`
+- `AZURE_AD_REDIRECT_URI`
 - `AZURE_AD_TENANT_ID`
-- `SQL_USER`
+- `DATABASE_URL`
+- `NEXT_PUBLIC_API_BASE_URL`
+- `NEXT_PUBLIC_API_SCOPES`
+- `NEXT_PUBLIC_AZURE_AUTHORITY`
+- `NEXT_PUBLIC_AZURE_CLIENT_ID`
+- `NEXT_PUBLIC_AZURE_LOGOUT_REDIRECT_URI`
+- `NEXT_PUBLIC_POST_LOGOUT_REDIRECT_URI`
+- `NEXT_PUBLIC_REDIRECT_URI`
+- `SQL_DATABASE`
+- `SQL_OPTIONS_ENCRYPT`
+- `SQL_OPTIONS_TRUST_SERVER_CERTIFICATE`
 - `SQL_PASSWORD`
 - `SQL_SERVER`
-- `SQL_DATABASE`
+- `SQL_USER`
 - `DATABASE_URL`
 
 Refer to that file when creating your own `.env.local`.
