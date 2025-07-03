@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
+
 import { logger } from '@/lib/logger';
+
 
 interface Notification {
   id: number;
@@ -22,6 +24,7 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { msalInstance, accounts, inProgress, selectedEmployeeId } = useSelectedEmployee();
 
   useEffect(() => {
     if (isOpen) {
@@ -32,11 +35,18 @@ export default function NotificationBell() {
   const fetchNotifications = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/evaluation/notifications');
-      if (!response.ok) {
-        throw new Error('Failed to fetch notifications');
-      }
-      const data = await response.json();
+      const apiClientOptions: ApiClientOptions = {
+        msalInstance: msalInstance!,
+        selectedEmployeeId,
+        interactionStatus: inProgress,
+        activeAccount: accounts[0] || null,
+      };
+
+      const data = await fetchWithAuth<Notification[]>(
+        '/api/evaluation/notifications',
+        { method: 'GET' },
+        apiClientOptions
+      );
       setNotifications(data);
     } catch (error) {
       logger.error('Error fetching notifications:', error);
@@ -48,13 +58,20 @@ export default function NotificationBell() {
   const handleNotificationClick = async (notification: Notification) => {
     try {
       // Mark notification as read
-      await fetch('/api/evaluation/notifications', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const apiClientOptions: ApiClientOptions = {
+        msalInstance: msalInstance!,
+        selectedEmployeeId,
+        interactionStatus: inProgress,
+        activeAccount: accounts[0] || null,
+      };
+      await fetchWithAuth(
+        '/api/evaluation/notifications',
+        {
+          method: 'PUT',
+          body: JSON.stringify({ id: notification.id }),
         },
-        body: JSON.stringify({ id: notification.id }),
-      });
+        apiClientOptions
+      );
 
       // Navigate to the appropriate page based on notification type
       if (notification.metadata) {

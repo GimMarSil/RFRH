@@ -1,12 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Pool } from 'pg';
 import { getSession } from 'next-auth/react';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+import { pool } from '../../../../lib/db/pool';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

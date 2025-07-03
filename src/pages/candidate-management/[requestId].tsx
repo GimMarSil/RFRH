@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { useMsal } from "@azure/msal-react";
+import { fetchWithAuth, ApiClientOptions } from "@/lib/apiClient";
+import { useSelectedEmployee } from "@/contexts/SelectedEmployeeContext";
 import gsap from "gsap";
 import { ArrowLeft, Briefcase, Users, Building2, FileText, CalendarDays, Info, ChevronDown, ChevronRight, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -119,7 +120,7 @@ export default function CandidateManagementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef(null);
-  const { accounts } = useMsal();
+  const { msalInstance, accounts, inProgress, selectedEmployeeId } = useSelectedEmployee();
   const userName = accounts?.[0]?.name || 'Utilizador';
 
   const [hydrated, setHydrated] = useState(false);
@@ -166,12 +167,18 @@ export default function CandidateManagementPage() {
             'usergroups': JSON.stringify(user.idTokenClaims?.groups || []),
           };
 
-          const res = await fetch(`/api/recruitment?id=${requestId}`, { headers });
-          if (!res.ok) {
-            const errorData = await res.json().catch(() => ({ message: `Erro ${res.status}: ${res.statusText}` }));
-            throw new Error(errorData.message || 'Falha ao carregar detalhes do pedido');
-          }
-          const data = await res.json();
+          const apiClientOptions: ApiClientOptions = {
+            msalInstance: msalInstance!,
+            selectedEmployeeId,
+            interactionStatus: inProgress,
+            activeAccount: accounts[0] || null,
+          };
+
+          const data = await fetchWithAuth<Pedido>(
+            `/api/recruitment?id=${requestId}`,
+            { headers },
+            apiClientOptions
+          );
           setPedido(data);
         } catch (err: any) {
           setError(err.message);
@@ -217,12 +224,17 @@ export default function CandidateManagementPage() {
         'x-user-id': user?.localAccountId || user?.homeAccountId || 'unknown',
         'x-user-groups': JSON.stringify(user?.idTokenClaims?.groups || []),
       };
-      const res = await fetch(`/api/candidates?recruitment_id=${pedido.id}&stage=${stageId}`, { headers });
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ message: `Erro ao buscar candidatos para ${stageId}` }));
-        throw new Error(errorData.message);
-      }
-      const data = await res.json();
+      const apiClientOptions: ApiClientOptions = {
+        msalInstance: msalInstance!,
+        selectedEmployeeId,
+        interactionStatus: inProgress,
+        activeAccount: accounts[0] || null,
+      };
+      const data = await fetchWithAuth<Candidate[]>(
+        `/api/candidates?recruitment_id=${pedido.id}&stage=${stageId}`,
+        { headers },
+        apiClientOptions
+      );
       setCandidatesByStage(prev => ({ ...prev, [stageId]: data }));
     } catch (err: any) {
       logger.error(`Erro ao buscar candidatos para ${stageId}:`, err);
@@ -301,17 +313,20 @@ export default function CandidateManagementPage() {
         'x-user-groups': JSON.stringify(user?.idTokenClaims?.groups || []),
       };
 
-      const res = await fetch(`/api/candidates/${candidateId}`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ stage: newStage }),
-      });
+      const apiClientOptions: ApiClientOptions = {
+        msalInstance: msalInstance!,
+        selectedEmployeeId,
+        interactionStatus: inProgress,
+        activeAccount: accounts[0] || null,
+      };
+
 
       if (!res.ok) {
         const errorResult = await res.json().catch(() => ({ message: "Failed to update candidate stage on server." }));
         throw new Error(errorResult.message);
       }
       logger.log(`Candidate ${candidateId} stage updated to ${newStage} on server.`);
+
       // Optionally, show a success toast or notification
     } catch (error: any) {
       logger.error("Error updating candidate stage on server:", error);
@@ -384,17 +399,25 @@ export default function CandidateManagementPage() {
         'x-user-name': user?.name || 'Unknown User',
         'x-user-groups': JSON.stringify(user?.idTokenClaims?.groups || []),
       };
+      const apiClientOptions: ApiClientOptions = {
+        msalInstance: msalInstance!,
+        selectedEmployeeId,
+        interactionStatus: inProgress,
+        activeAccount: accounts[0] || null,
+      };
 
-      const res = await fetch('/api/candidates', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload),
-      });
+      const result = await fetchWithAuth<any>(
+        '/api/candidates',
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload),
+        },
+        apiClientOptions
+      );
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.message || 'Falha ao adicionar candidato.');
+      if (!result) {
+        throw new Error('Falha ao adicionar candidato.');
       }
       setSubmissionStatus({ type: 'success', message: 'Candidato adicionado com sucesso!' });
       // Refresh candidate list for the stage
@@ -445,17 +468,25 @@ export default function CandidateManagementPage() {
         'x-user-name': user?.name || 'Unknown User',
         'x-user-groups': JSON.stringify(user?.idTokenClaims?.groups || []),
       };
+      const apiClientOptions: ApiClientOptions = {
+        msalInstance: msalInstance!,
+        selectedEmployeeId,
+        interactionStatus: inProgress,
+        activeAccount: accounts[0] || null,
+      };
 
-      const res = await fetch(`/api/candidates/${selectedCandidateForViewEdit.id}`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify(payload), // Send only the updatable fields
-      });
+      const result = await fetchWithAuth<any>(
+        `/api/candidates/${selectedCandidateForViewEdit.id}`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(payload),
+        },
+        apiClientOptions
+      );
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.message || 'Falha ao atualizar candidato.');
+      if (!result) {
+        throw new Error('Falha ao atualizar candidato.');
       }
       setSubmissionStatus({ type: 'success', message: 'Candidato atualizado com sucesso!' });
       // Refresh candidate list for the stage

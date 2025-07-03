@@ -84,6 +84,7 @@ const EvaluationFormPage = () => {
           apiClientOptions
         );
         setEvaluationData(fetchedData);
+
       } catch (err: any) {
         logger.error("Error fetching evaluation details:", err);
         if (err instanceof InteractionRequiredAuthError) {
@@ -92,6 +93,7 @@ const EvaluationFormPage = () => {
         } else {
           setError(err.data?.message || err.message || "Falha ao carregar detalhes da avaliação.");
         }
+
       } finally {
         setIsLoading(false);
       }

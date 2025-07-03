@@ -22,9 +22,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const result = await client.query(
-      `SELECT e.id, e.name, e.email, e.position, e.department
+      `SELECT e.employee_number, e.name, e.email, e.position, e.department
        FROM employees e
-       INNER JOIN evaluation_matrix_applicability ema ON e.id = ema.employee_id
+       INNER JOIN evaluation_matrix_applicability ema ON e.employee_number = ema.employee_id
        WHERE ema.matrix_id = $1
        ORDER BY e.name`,
       [matrixId]
