@@ -42,12 +42,6 @@ function validateConfig() {
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
-
-    SQL_SERVER: process.env.SQL_SERVER,
-    SQL_DATABASE: process.env.SQL_DATABASE,
-    SQL_USER: process.env.SQL_USER,
-    DATABASE_URL: process.env.DATABASE_URL ? '***' : undefined
-  });
 }
 
 async function main() {

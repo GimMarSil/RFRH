@@ -28,66 +28,35 @@ export default async function handler(req, res) {
   const { userId } = req.query;
 
   try {
-
     await sql.connect(sqlConfig);
 
-    let result;
-    if (userId === "ALL") {
-      // Buscar todos os funcionários
-      result = await sql.query`
-        SELECT 
-          [Number] as employee_number,
-          [Email],
-          [Name],
-          [Active],
-          [CompanyName],
-          [UserId] as user_id,
-          [Department],
-          [AdmissionDate],
-          [SyncStatus],
-          [Current],
-          [TerminationDate],
-          [CreatedAt],
-          [CreatedBy],
-          [UpdatedAt],
-          [UpdatedBy],
-          [IdentityCard],
-          [LastSync],
-          [PassportNumber],
-          [SalaryRule],
-          [ScheduleId]
-        FROM [RFWebApp].[dbo].[Employee]
-        WHERE [Active] = 1
-      `;
+    const columnRes = await sql.query`SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Employee'`;
+    const cols: string[] = columnRes.recordset.map(r => r.COLUMN_NAME);
+    const selectCols = cols.map(c => {
+      if (c === 'Number') return '[Number] as employee_number';
+      if (c === 'UserId') return '[UserId] as user_id';
+      return `[${c}]`;
+    }).join(', ');
+
+    const baseQuery = `SELECT ${selectCols} FROM [RFWebApp].[dbo].[Employee]`;
+
+    const activeCondition = cols.includes('Active') ? ' [Active] = 1' : '1=1';
+
+    let query: string;
+    if (userId === 'ALL') {
+      query = `${baseQuery} WHERE${activeCondition}`;
     } else {
-      // Buscar apenas funcionários do userId
-      result = await sql.query`
-        SELECT 
-          [Number] as employee_number,
-          [Email],
-          [Name],
-          [Active],
-          [CompanyName],
-          [UserId] as user_id,
-          [Department],
-          [AdmissionDate],
-          [SyncStatus],
-          [Current],
-          [TerminationDate],
-          [CreatedAt],
-          [CreatedBy],
-          [UpdatedAt],
-          [UpdatedBy],
-          [IdentityCard],
-          [LastSync],
-          [PassportNumber],
-          [SalaryRule],
-          [ScheduleId]
-        FROM [RFWebApp].[dbo].[Employee]
-        WHERE [UserId] = ${userId}
-        AND [Active] = 1
-      `;
+      const conditions: string[] = [];
+      if (cols.includes('UserId')) conditions.push('[UserId] = @userId');
+      if (cols.includes('Email')) conditions.push('[Email] = @userId');
+      if (cols.includes('UserPrincipalName')) conditions.push('[UserPrincipalName] = @userId');
+      const where = conditions.length ? `(${conditions.join(' OR ')})` : '1=1';
+      query = `${baseQuery} WHERE ${where} AND${activeCondition}`;
     }
+
+    const request = new sql.Request();
+    request.input('userId', sql.NVarChar, userId as string);
+    const result = await request.query(query);
 
     res.status(200).json(result.recordset);
   } catch (error) {
