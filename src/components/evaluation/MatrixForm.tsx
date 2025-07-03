@@ -403,4 +403,4 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
   );
 };
 
-export default MatrixForm; 
+export default MatrixForm;

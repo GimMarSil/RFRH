@@ -143,4 +143,4 @@ export default async function handler(req, res) {
     res.setHeader('Allow', ['PATCH', 'DELETE']);
     return res.status(405).json({ message: `Método ${req.method} não permitido.` });
   }
-} 
+}

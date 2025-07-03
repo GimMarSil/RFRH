@@ -13,4 +13,4 @@ export function FuncionarioProvider({ children }) {
 
 export function useFuncionario() {
   return useContext(FuncionarioContext);
-} 
+}
