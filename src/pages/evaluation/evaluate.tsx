@@ -67,7 +67,6 @@ const EvaluateSubordinatePage = () => {
 
       try {
         // No need to acquire token manually, fetchWithAuth handles it.
-        console.log("Fetching user role info...");
         const data = await fetchWithAuth<UserRoleInfo>(
           '/api/evaluation/user-role-info',
           { method: 'GET' },
@@ -81,12 +80,10 @@ const EvaluateSubordinatePage = () => {
         setEmployeeProfileName(data.name); 
         setIsManagerRole(data.isManager);
 
-        console.log("Fetched User Info Subordinates:", data.subordinates);
-        console.log("Context updated: selectedEmployeeId:", data.employeeId, "systemUserId:", data.userId);
 
       } catch (err: any) {
         if (err instanceof InteractionRequiredAuthError) {
-          console.warn('Silent token acquisition failed via fetchWithAuth. Interaction required.');
+          // Silent token acquisition failed via fetchWithAuth. Interaction required.
           console.error("InteractionRequiredAuthError details:", err); 
           setError(`Falha na aquisição de token: ${err.message || err.errorMessage}. Interação pode ser necessária.`);
           // Potentially trigger interactive token acquisition here if not handled globally by msal-react or _app.tsx

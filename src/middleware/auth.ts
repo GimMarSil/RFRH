@@ -161,7 +161,6 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
     });
 
     if (!groupsResponse.ok) {
-      console.warn('Could not fetch user groups from Microsoft Graph');
       return {
         id: user.userPrincipalName,
         roles: []

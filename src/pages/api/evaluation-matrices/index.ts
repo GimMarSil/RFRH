@@ -34,14 +34,12 @@ async function setUserForSession(client, userId) {
 
 async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string | null> {
   // TODO: Replace with actual MSAL or equivalent authentication logic
-  console.warn('Using placeholder system user ID for audit logs in evaluation matrices API. Integrate actual authentication.');
   return 'system-placeholder-user-id';
 }
 
 async function getSelectedEmployeeId(req: NextApiRequest): Promise<string | null> {
   const selectedEmployeeId = req.headers['x-selected-employee-id'] as string;
   if (!selectedEmployeeId) {
-    console.warn('X-Selected-Employee-ID header not found for evaluation matrices API.');
     return null;
   }
   return selectedEmployeeId;

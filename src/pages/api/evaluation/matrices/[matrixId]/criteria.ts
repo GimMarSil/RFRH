@@ -10,17 +10,15 @@ const pool = new Pool({
 // Renamed: Helper to get the actual logged-in system user ID (e.g., from MSAL)
 async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string | null> {
   // TODO: Replace with your ACTUAL MSAL token validation and user ID extraction.
-  console.warn('MATRIX_CRITERIA_API: Using placeholder system User ID. Integrate actual MSAL authentication.');
-  return 'logged-in-system-user-via-msal'; 
+  return 'logged-in-system-user-via-msal';
 }
 
 // Helper to get the Employee ID the user is currently acting as (selected on landing)
 function getSelectedEmployeeId(req: NextApiRequest): string | null {
     const fromHeader = req.headers['x-selected-employee-id'];
     if (fromHeader) return Array.isArray(fromHeader) ? fromHeader[0] : fromHeader;
-    if (req.body && req.body.actingAsEmployeeId) return req.body.actingAsEmployeeId; 
-    console.warn('MATRIX_CRITERIA_API: selectedEmployeeId not found in headers (X-Selected-Employee-ID) or body (actingAsEmployeeId).');
-    return null; 
+    if (req.body && req.body.actingAsEmployeeId) return req.body.actingAsEmployeeId;
+    return null;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

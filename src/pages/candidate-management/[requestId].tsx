@@ -257,7 +257,6 @@ export default function CandidateManagementPage() {
       return;
     }
     
-    console.log(`Candidate ${candidateId} dragged from stage ${sourceStageId} (index ${source.index}) to stage ${destStageId} (index ${destination.index})`);
 
     // Optimistically update UI
     setCandidatesByStage(prev => {
@@ -310,7 +309,7 @@ export default function CandidateManagementPage() {
         const errorResult = await res.json().catch(() => ({ message: "Failed to update candidate stage on server." }));
         throw new Error(errorResult.message);
       }
-      console.log(`Candidate ${candidateId} stage updated to ${newStage} on server.`);
+      // Candidate stage updated on server
       // Optionally, show a success toast or notification
     } catch (error: any) {
       console.error("Error updating candidate stage on server:", error);

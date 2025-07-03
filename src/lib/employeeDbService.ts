@@ -22,7 +22,6 @@ const sqlConfigConnection = {
 // Your Employee.UserId column stores the UPN based on user-role-info.ts.
 export async function getEmployeeUpnFromNumber(employeeNumber: string): Promise<string | null> {
   if (!employeeNumber) {
-    console.warn('getEmployeeUpnFromNumber: employeeNumber was not provided.');
     return null;
   }
 
@@ -36,7 +35,6 @@ export async function getEmployeeUpnFromNumber(employeeNumber: string): Promise<
     if (result.recordset.length > 0 && result.recordset[0].UserId) {
       return result.recordset[0].UserId;
     } else {
-      console.warn(`getEmployeeUpnFromNumber: No active user found for employee number ${employeeNumber} or UserId is null.`);
       return null;
     }
   } catch (dbError) {

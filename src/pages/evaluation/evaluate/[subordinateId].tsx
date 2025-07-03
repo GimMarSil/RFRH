@@ -70,7 +70,7 @@ const EvaluationFormPage = () => {
       };
 
       try {
-        console.log(`Fetching evaluation data for subordinate: ${subordinateId}, by manager: ${managerEmployeeId}`);
+        // Fetching evaluation data for subordinate
         // TODO: Replace with actual API endpoint and data structure
         // This endpoint would need to:
         // 1. Find or initiate an employee_evaluation for the subordinateId, managerEmployeeId, and current period/matrix.

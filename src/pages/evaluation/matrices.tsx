@@ -51,8 +51,7 @@ interface Applicability {
 
 const formatDate = (dateString: string) => {
   if (!dateString) {
-    console.warn("formatDate received empty or null dateString");
-    return ''; // Or 'N/A' or some other placeholder for empty dates
+    return '';
   }
   try {
     // Test if dateString already contains time information or 'Z'
@@ -62,10 +61,8 @@ const formatDate = (dateString: string) => {
     if (!hasTimeOrUTC && /\d{4}-\d{2}-\d{2}/.test(dateString.substring(0,10))) {
       // If it looks like YYYY-MM-DD without time, append T00:00:00Z for UTC parsing
       dateToParse = dateString.substring(0,10) + 'T00:00:00Z';
-      console.log(`formatDate: Appended T00:00:00Z to ${dateString.substring(0,10)}, parsing: ${dateToParse}`);
     } else {
       // If it already has T or Z, or is not in YYYY-MM-DD format, try parsing as is
-      console.log(`formatDate: Parsing as is: ${dateToParse}`);
     }
 
     const date = new Date(dateToParse);
@@ -113,7 +110,6 @@ export default function EvaluationMatricesPage() {
   // Add immediate redirect if no selectedEmployeeId
   useEffect(() => {
     if (!selectedEmployeeId && !isLoading) {
-      console.log('No selected employee ID, redirecting to landing page');
       router.replace('/landing');
     }
   }, [selectedEmployeeId, isLoading, router]);
@@ -121,16 +117,10 @@ export default function EvaluationMatricesPage() {
   // Add authentication check effect
   useEffect(() => {
     if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None) {
-      console.log('Authentication not ready:', {
-        hasMsalInstance: !!msalInstance,
-        hasActiveAccount: !!activeAccount,
-        interactionStatus
-      });
       return;
     }
 
     if (!selectedEmployeeId) {
-      console.log('No selected employee ID, redirecting to landing page');
       router.replace('/landing');
       return;
     }
@@ -141,11 +131,8 @@ export default function EvaluationMatricesPage() {
 
   async function fetchMatrices() {
     if (!selectedEmployeeId) {
-      console.warn('fetchMatrices called without selectedEmployeeId');
       return;
     }
-
-    console.log('[MatricesPage] fetchMatrices called with selectedEmployeeId:', selectedEmployeeId);
     setIsLoading(true);
     setError(null);
 
@@ -182,7 +169,6 @@ export default function EvaluationMatricesPage() {
       setSubordinates([]);
 
       if (msalInstance && currentActiveAccount && inProgress === InteractionStatus.None && selectedEmployeeId) {
-        console.log('[MatricesPage] Attempting to fetch subordinates and manager status. Manager ID:', selectedEmployeeId);
         try {
           const apiClientOpts = {
             msalInstance,
@@ -198,11 +184,11 @@ export default function EvaluationMatricesPage() {
           if (roleInfo) {
             setSubordinates(roleInfo.subordinates || []);
             setIsManager(roleInfo.isManager || false); // Store isManager
-            console.log('[MatricesPage] Fetched user role info:', {isManager: roleInfo.isManager, numSubordinates: roleInfo.subordinates?.length });
+            // Fetched user role info
           } else {
             setSubordinates([]);
             setIsManager(false);
-            console.log('[MatricesPage] No roleInfo received.');
+            // No roleInfo received
           }
         } catch (err: any) {
           console.error('Failed to fetch subordinates/manager status:', err);
@@ -217,17 +203,10 @@ export default function EvaluationMatricesPage() {
   }, [msalInstance, accounts, inProgress, selectedEmployeeId]);
 
   useEffect(() => {
-    console.log('[MatricesPage] useEffect for fetching matrices triggered. Values:', {
-        hasMsalInstance: !!msalInstance,
-        accountsLength: accounts?.length,
-        inProgressStatus: inProgress,
-        employeeId: selectedEmployeeId,
-    });
 
     // 1. Wait for MSAL instance and for inProgress to be defined and not in startup/redirect phase.
     if (!msalInstance || inProgress === undefined || inProgress === InteractionStatus.Startup || inProgress === InteractionStatus.HandleRedirect) {
-        console.log('[MatricesPage] Waiting for MSAL initialization or redirect/startup to complete. isLoading remains true.');
-        // setIsLoading(true); // Implicitly, isLoading is true initially or from previous state
+        // Waiting for MSAL initialization or redirect/startup to complete
         return; // Exit and wait for these dependencies to change and re-trigger useEffect
     }
 
@@ -237,21 +216,19 @@ export default function EvaluationMatricesPage() {
     // 2. Check if interaction is None (i.e., idle and ready)
     if (inProgress === InteractionStatus.None) {
         if (currentActiveAccount && selectedEmployeeId) {
-            console.log('[MatricesPage] Conditions fully met (MSAL Ready, InteractionStatus.None, Account, EmployeeID). Calling fetchMatrices().');
             fetchMatrices();
         } else {
-            console.log('[MatricesPage] MSAL Ready and InteractionStatus is None, but ActiveAccount or SelectedEmployeeId is missing. Not fetching.');
             setIsLoading(false); // Can stop loading as we won't fetch under these conditions
-            if (!currentActiveAccount && msalInstance) { 
+            if (!currentActiveAccount && msalInstance) {
                 setError("Login necessário ou nenhuma conta ativa encontrada.");
-            } else if (!selectedEmployeeId && currentActiveAccount) { 
+            } else if (!selectedEmployeeId && currentActiveAccount) {
                 setError("Por favor, selecione um perfil de funcionário para carregar as matrizes.");
             }
         }
     } else {
         // Interaction is in progress (e.g., login, acquireToken) but not startup/redirect/undefined.
         // This means user interaction might be required or is ongoing.
-        console.log(`[MatricesPage] MSAL interaction is currently '${inProgress}'. Waiting for it to resolve to 'None'. isLoading remains true.`);
+        // MSAL interaction is currently in progress
         // setIsLoading(true); // Keep loading, as we are actively waiting for an MSAL process
     }
      // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -304,12 +281,10 @@ export default function EvaluationMatricesPage() {
 
   const fetchMatrixApplicability = async (matrixId: string): Promise<string[]> => {
     if (!matrixId || matrixId === "undefined") {
-      console.warn('[MatricesPage] fetchMatrixApplicability: matrixId inválido ou não fornecido.');
       toast.error("Não é possível buscar aplicabilidade: ID da matriz inválido.");
       return [];
     }
     if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None || !selectedEmployeeId) {
-      console.warn('[MatricesPage] fetchMatrixApplicability: Prerequisites for fetchWithAuth not met.');
       toast.error("Não é possível buscar aplicabilidade da matriz: contexto de autenticação inválido.");
       return [];
     }
@@ -330,7 +305,7 @@ export default function EvaluationMatricesPage() {
       // Placeholder: If the matrix object itself contains applicability from the main fetch, use that.
       // This part needs to align with how applicability is fetched/stored.
       // For now, returning empty as the endpoint might not exist.
-      console.warn(`[MatricesPage] fetchMatrixApplicability for matrix ${matrixId} - actual API call for applicability not implemented or placeholder used.`);
+      // Placeholder: API call for applicability not implemented
       const matrix = matrices.find(m => (m.id || m.matrix_id) === matrixId);
       return matrix?.applicable_employee_ids || [];
 
@@ -366,7 +341,6 @@ export default function EvaluationMatricesPage() {
       criteria: data.criteria.map(c => ({ ...c, weight: Number(c.weight) || 0 })),
     };
     
-    console.log('[MatricesPage] Saving matrix with data:', processedData);
 
     try {
       const apiClientOpts = {
@@ -376,13 +350,7 @@ export default function EvaluationMatricesPage() {
         selectedEmployeeId,
       };
       
-      console.log('[MatricesPage] handleSaveMatrix - Preparing to call fetchWithAuth. apiClientOpts:', {
-        msalInstanceExists: !!apiClientOpts.msalInstance,
-        interactionStatus: apiClientOpts.interactionStatus,
-        activeAccountExists: !!apiClientOpts.activeAccount,
-        selectedEmployeeId: apiClientOpts.selectedEmployeeId,
-        accountDetails: apiClientOpts.activeAccount // Log the whole account object if it exists
-      });
+      // Preparing to call fetchWithAuth
 
       await fetchWithAuth(
         url, 
@@ -479,7 +447,7 @@ export default function EvaluationMatricesPage() {
       ? newMatrixData.criteria.map(c => ({ ...c, id: undefined }))
       : [];
 
-    console.log('[MatricesPage] Attempting to save copied matrix:', newMatrixData);
+    // Attempting to save copied matrix
     setShowFormModal(true);
     setEditingMatrix(newMatrixData); // Open form with copied data for potential edits before saving
     setSelectedApplicableEmployees(newMatrixData.applicable_employee_ids || []);

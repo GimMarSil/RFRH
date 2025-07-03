@@ -163,7 +163,6 @@ export default function RecruitmentDashboard() {
   const userId = user?.username;
   const userGroups = Array.isArray(user?.idTokenClaims?.groups) ? user.idTokenClaims.groups : [];
   const isRH = userGroups.includes("a837ee80-f103-4d51-9869-e3b4da6bdeda");
-  console.log("Dashboard User Auth: userGroups", userGroups, "isRH", isRH);
   const [hydrated, setHydrated] = useState(false);
 
   // State for approval/rejection workflow - MOVED EARLIER
@@ -209,7 +208,6 @@ export default function RecruitmentDashboard() {
         const date = new Date(pedido.request_date);
         // Ensure date is valid before proceeding
         if (isNaN(date.getTime())) {
-          console.warn("Invalid request_date:", pedido.request_date);
           return acc;
         }
         const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -249,10 +247,6 @@ export default function RecruitmentDashboard() {
   }, []);
 
   // Log chart data for debugging
-  console.log("Estado Chart Data:", estadoChartData);
-  console.log("Departamento Chart Data:", departamentoChartData);
-  console.log("Monthly Chart Data:", monthlyChartData);
-  console.log("Contract Types Chart Data:", contractTypesChartData);
 
   const themeOptions = [
     { value: 'light', label: 'Claro', icon: '🌞' },
@@ -296,7 +290,6 @@ export default function RecruitmentDashboard() {
       setError(null);
       try {
         const azureUserId = accounts[0]?.username;
-        console.log("Fetching employees for Azure AD userId:", azureUserId);
         if (!azureUserId) {
           throw new Error("Azure AD User ID not available.");
         }
@@ -410,7 +403,6 @@ export default function RecruitmentDashboard() {
     const pedido = pedidos.find(p => p.id === id);
     setPedidoSelecionado(pedido);
     setShowPedidoModal(true);
-    console.log("Opening Pedido Modal: pedidoSelecionado", pedido, "Estado do Pedido?", pedido?.estado);
     try {
       const res = await fetch(`/api/recruitment-log?recruitmentId=${id}`);
       const logs = await res.json();

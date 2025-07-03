@@ -101,7 +101,6 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
     const fetchActiveMatrixForSubs = async () => {
       if (!subordinatesList || subordinatesList.length === 0) return;
       if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None || !currentSelectedEmployeeId) {
-        console.warn('[MatrixForm] fetchActiveMatrixForSubs: MSAL context not ready or no selected employee ID.');
         return;
       }
 
@@ -128,11 +127,7 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
     fetchActiveMatrixForSubs();
   }, [subordinatesList, msalInstance, activeAccount, interactionStatus, currentSelectedEmployeeId]);
 
-  // Debug logs para garantir tipos corretos
-  console.log('subordinatesWithActiveMatrix:', subordinatesWithActiveMatrix);
-  console.log('typeof subordinatesWithActiveMatrix[0]:', typeof subordinatesWithActiveMatrix[0]);
-  console.log('subordinatesList ids:', subordinatesList?.map(s => s.id));
-  console.log('typeof subordinatesList[0].id:', typeof subordinatesList?.[0]?.id);
+  // Debug logs can be added here if needed
 
   // Handle subordinate selection change for checkboxes
   const handleSubordinateSelection = (subordinateId: string | number) => {

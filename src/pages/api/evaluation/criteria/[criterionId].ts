@@ -13,7 +13,6 @@ const pool = new Pool({
 async function getAuthenticatedSystemUserId(req: AuthenticatedRequest): Promise<string | null> {
   // TODO: Replace with actual MSAL or equivalent authentication logic
   // This ID is the system-wide user identifier, used for audit trails (e.g., created_by_user_id)
-  console.warn('Using placeholder system user ID for audit logs in individual criterion API. Integrate actual authentication.');
   return 'system-placeholder-user-id'; // Example: MSAL Object ID
 }
 
@@ -24,7 +23,6 @@ async function getSelectedEmployeeId(req: AuthenticatedRequest): Promise<string 
   // It's used for role-based access and business logic (e.g., manager_id, employee_id).
   const selectedEmployeeId = req.headers['x-selected-employee-id'] as string;
   if (!selectedEmployeeId) {
-    console.warn('X-Selected-Employee-ID header not found. Operations may fail authorization.');
     return null;
   }
   return selectedEmployeeId; 

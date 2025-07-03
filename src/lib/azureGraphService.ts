@@ -42,7 +42,6 @@ export async function fetchFromGraph(graphToken: string, url: string): Promise<a
 // Helper specifically for getting direct subordinates
 export async function getDirectGraphSubordinates(userAzureAdId: string): Promise<GraphUser[]> {
   if (!userAzureAdId) {
-    console.warn('getDirectGraphSubordinates: userAzureAdId was not provided.');
     return [];
   }
   

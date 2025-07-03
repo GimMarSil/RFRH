@@ -16,7 +16,6 @@ async function checkUserAuthorization(req): Promise<{ authorized: boolean; userI
   const userNameHeader = req.headers['x-user-name'];
 
   if (!userIdHeader) {
-    console.warn("User ID not found in request for authorization.");
     return { authorized: false };
   }
 
@@ -34,7 +33,7 @@ async function checkUserAuthorization(req): Promise<{ authorized: boolean; userI
       // Fall through to return not authorized
     }
   }
-  console.warn('User does not belong to the required group for approval/rejection.');
+  // User does not belong to the required group
   return { authorized: false, userId, userName }; // Default to not authorized
 }
 

@@ -43,15 +43,14 @@ export async function fetchWithAuth<T = any>(
 
   let tokenResponse;
 
-  console.log(`[apiClient] fetchWithAuth attempting for URL: ${apiUrl}, Method: ${requestOptions.method}`);
-  console.log('[apiClient] Options:', { interactionStatus, selectedEmployeeId, activeAccountUsername: activeAccount.username });
+  // Debug: incoming request details can be logged here if needed
 
   try {
     if (interactionStatus === InteractionStatus.None) {
       tokenResponse = await msalInstance.acquireTokenSilent(request);
-      console.log(`[apiClient] Token acquired silently for ${apiUrl}:`, tokenResponse ? 'Token obtained' : 'Token NOT obtained');
+      // Token acquired silently
     } else {
-      console.warn(`[apiClient] Interaction in progress (${interactionStatus}), skipping silent token acquisition for ${apiUrl}. This might lead to auth failure if a redirect/popup isn't completing.`);
+      // Interaction in progress; skipping silent token acquisition for now
       // Decide if we should attempt acquireTokenRedirect/Popup here or if the main app flow handles it.
       // For now, we'll let it proceed, and if no token, it will fail below.
       // This situation (interaction in progress) should ideally resolve before making API calls.
@@ -59,7 +58,7 @@ export async function fetchWithAuth<T = any>(
   } catch (error) {
     console.error(`[apiClient] Silent token acquisition failed for ${apiUrl}:`, error);
     if (error instanceof InteractionRequiredAuthError) {
-      console.log(`[apiClient] Interaction required for ${apiUrl}. Depending on app flow, redirect/popup should be invoked.`);
+      // Interaction required for token acquisition
       // msalInstance.acquireTokenRedirect(request); // Or acquireTokenPopup
       // For now, let API call fail to indicate an issue with interaction handling.
     }
@@ -72,7 +71,7 @@ export async function fetchWithAuth<T = any>(
   } else {
     // This warning is useful for most endpoints. Some endpoints (like an initial user-role lookup)
     // might legitimately be called without a selectedEmployeeId.
-    console.warn(`X-Selected-Employee-ID is not set for API call to ${apiUrl}. This might be an issue for some endpoints.`);
+    // Selected employee ID not set for API call
   }
   if (requestOptions.method !== 'GET' && requestOptions.method !== 'HEAD' && requestOptions.body) {
     headers.append('Content-Type', 'application/json');
@@ -80,15 +79,15 @@ export async function fetchWithAuth<T = any>(
 
   if (tokenResponse && tokenResponse.accessToken) {
     headers.append('Authorization', `Bearer ${tokenResponse.accessToken}`);
-    console.log(`[apiClient] Authorization header added for ${apiUrl}. Token snippet: ${tokenResponse.accessToken.substring(0, 20)}...`);
+    // Authorization header added for request
   } else {
-    console.warn(`[apiClient] No access token available for ${apiUrl}. Proceeding without Authorization header. This will likely fail for protected routes.`);
+    // No access token available for request
     // For GET requests, we used to let them pass, but now we are stricter.
     // However, if the server simply complains about *no header* vs. an *invalid token*,
     // this branch means the header isn't even being added.
   }
   
-  console.log(`[apiClient] Headers being sent for ${apiUrl}:`, Array.from(headers.entries()));
+  // Headers being sent can be logged here for debugging
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''; // e.g., http://localhost:3000
 
@@ -99,7 +98,7 @@ export async function fetchWithAuth<T = any>(
     });
 
     if (apiUrl.includes('activeMatrixCheck')) {
-      console.log(`[apiClient] Response status for activeMatrixCheck (${apiUrl}): ${response.status}`);
+      // Log response status for activeMatrixCheck
     }
 
     if (!response.ok) {
@@ -174,7 +173,7 @@ function MyComponent() {
         { method: "GET" }, 
         clientOptions
       );
-      console.log("Fetched data:", data);
+      // Fetched data received
 
       // Example POST request
       // const postData = { name: "Test" };

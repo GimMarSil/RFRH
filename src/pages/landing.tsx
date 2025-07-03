@@ -76,7 +76,6 @@ const LandingPage: React.FC = () => {
       try {
         const azureUserId = accounts[0]?.username;
         if (!azureUserId) {
-          console.warn("Azure AD User ID not available for employee fetching.");
           setFuncionarios([]);
           setLoadingFuncionarios(false);
           return;
@@ -113,7 +112,6 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     if (funcionarioSelecionado && typeof funcionarioSelecionado.employee_number === 'number') {
       const employeeIdStr = funcionarioSelecionado.employee_number.toString();
-      console.log(`[LandingPage] FuncionarioSelecionado valid, updating SelectedEmployeeContext with ID: ${employeeIdStr}`, funcionarioSelecionado);
       setSelectedEmployeeId(employeeIdStr);
       setEmployeeProfileName(funcionarioSelecionado.Name);
       
@@ -125,12 +123,10 @@ const LandingPage: React.FC = () => {
       }
     } else if (funcionarioSelecionado) {
       // Log se funcionarioSelecionado existe mas employee_number não é válido
-      console.warn('[LandingPage] FuncionarioSelecionado exists but employee_number is invalid:', funcionarioSelecionado);
       setSelectedEmployeeId(null); // Garante que fica nulo se o ID não for válido
       setEmployeeProfileName(null);
       setIsManagerRole(false);
     } else {
-      console.log('[LandingPage] FuncionarioSelecionado deselected, clearing parts of SelectedEmployeeContext.');
       setSelectedEmployeeId(null);
       setEmployeeProfileName(null);
       setIsManagerRole(false);

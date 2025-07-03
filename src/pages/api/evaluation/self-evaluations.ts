@@ -14,7 +14,6 @@ const pool = new Pool({
 // Helper to get authenticated user ID (replace with your actual auth logic)
 async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string | null> {
   // TODO: Replace with actual MSAL or equivalent authentication logic
-  console.warn('Using placeholder system user ID for audit logs in self-evaluations API. Integrate actual authentication.');
   return 'system-placeholder-user-id'; // Example: MSAL Object ID
 }
 
@@ -24,7 +23,6 @@ async function getSelectedEmployeeId(req: NextApiRequest): Promise<string | null
   const selectedEmployeeId = req.headers['x-selected-employee-id'] as string;
   if (!selectedEmployeeId) {
     // For self-evaluations, selectedEmployeeId is almost always required.
-    console.warn('X-Selected-Employee-ID header not found for self-evaluations API. This is critical.');
     return null;
   }
   return selectedEmployeeId;
