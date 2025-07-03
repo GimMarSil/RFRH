@@ -83,14 +83,15 @@ const EvaluationFormPage = () => {
           apiClientOptions
         );
         setEvaluationData(fetchedData);
-      } catch (err: any) {
-        console.error("Error fetching evaluation details:", err);
-        if (err instanceof InteractionRequiredAuthError) {
-          setError("Sessão expirada ou requer interação. Por favor, tente autenticar novamente.");
-          // Potentially trigger interactive login
-        } else {
-          setError(err.data?.message || err.message || "Falha ao carregar detalhes da avaliação.");
-        }
+        } catch (err: unknown) {
+          console.error("Error fetching evaluation details:", err);
+          if (err instanceof InteractionRequiredAuthError) {
+            setError("Sessão expirada ou requer interação. Por favor, tente autenticar novamente.");
+            // Potentially trigger interactive login
+          } else {
+            const apiErr = err as { data?: { message?: string }; message?: string };
+            setError(apiErr.data?.message || apiErr.message || "Falha ao carregar detalhes da avaliação.");
+          }
       } finally {
         setIsLoading(false);
       }
