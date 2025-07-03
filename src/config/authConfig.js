@@ -1,10 +1,5 @@
 import { LogLevel } from "@azure/msal-browser";
 
-// Temporary debugging logs
-console.log("DEBUG: Client ID:", process.env.NEXT_PUBLIC_AZURE_CLIENT_ID);
-console.log("DEBUG: Authority:", process.env.NEXT_PUBLIC_AZURE_AUTHORITY);
-console.log("DEBUG: Redirect URI:", process.env.NEXT_PUBLIC_REDIRECT_URI);
-
 export const msalConfig = {
     auth: {
         clientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID,
