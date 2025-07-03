@@ -8,12 +8,9 @@ const pgClient = new Client({
 
 async function main() {
   try {
-    console.log('Connecting to Railway Postgres...');
     await pgClient.connect();
-    console.log('Connected to Railway Postgres successfully');
 
     // Primeiro, vamos dropar as tabelas existentes na ordem correta
-    console.log('Dropping existing tables...');
     await pgClient.query(`
       DROP TABLE IF EXISTS self_evaluation_scores CASCADE;
       DROP TABLE IF EXISTS self_evaluations CASCADE;
@@ -26,7 +23,6 @@ async function main() {
     `);
 
     // Criar tabela de funcionários
-    console.log('Creating employees table...');
     await pgClient.query(`
       CREATE TABLE employees (
         employee_number TEXT PRIMARY KEY,
@@ -54,7 +50,6 @@ async function main() {
     `);
 
     // Criar tabela de matrizes de avaliação
-    console.log('Creating evaluation_matrices table...');
     await pgClient.query(`
       CREATE TABLE evaluation_matrices (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -72,7 +67,6 @@ async function main() {
     `);
 
     // Criar tabela de critérios de avaliação
-    console.log('Creating evaluation_criteria table...');
     await pgClient.query(`
       CREATE TABLE evaluation_criteria (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -92,7 +86,6 @@ async function main() {
     `);
 
     // Criar tabela de aplicabilidade de matrizes
-    console.log('Creating matrix_applicability table...');
     await pgClient.query(`
       CREATE TABLE matrix_applicability (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -112,7 +105,6 @@ async function main() {
     `);
 
     // Criar tabela de avaliações
-    console.log('Creating evaluations table...');
     await pgClient.query(`
       CREATE TABLE evaluations (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -136,7 +128,6 @@ async function main() {
     `);
 
     // Criar tabela de scores de avaliação
-    console.log('Creating evaluation_criteria_scores table...');
     await pgClient.query(`
       CREATE TABLE evaluation_criteria_scores (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -157,7 +148,6 @@ async function main() {
     `);
 
     // Criar tabela de auto-avaliações
-    console.log('Creating self_evaluations table...');
     await pgClient.query(`
       CREATE TABLE self_evaluations (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -180,7 +170,6 @@ async function main() {
     `);
 
     // Criar tabela de scores de auto-avaliação
-    console.log('Creating self_evaluation_scores table...');
     await pgClient.query(`
       CREATE TABLE self_evaluation_scores (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -200,7 +189,6 @@ async function main() {
       );
     `);
 
-    console.log('All tables created successfully!');
 
   } catch (err) {
     console.error('Error creating tables:', err);

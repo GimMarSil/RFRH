@@ -71,7 +71,6 @@ try {
   validateMsalConfig();
   msalInstance = new PublicClientApplication(msalConfig);
   confidentialClient = new ConfidentialClientApplication(msalNodeConfig);
-  console.log('MSAL instances initialized successfully');
 } catch (error) {
   console.error('Failed to initialize MSAL:', error);
   throw error;
@@ -114,7 +113,6 @@ async function getGraphApiToken(): Promise<string> {
 
 // Helper to validate user token
 async function validateUserToken(token: string): Promise<{ id: string; roles: string[] } | null> {
-  console.log('🔐 Validating token against Microsoft Graph...');
 
   try {
     // Get Graph API token using client credentials
@@ -148,7 +146,6 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
     }
 
     const user = await response.json();
-    console.log('✅ Microsoft Graph user info:', user);
 
     if (!user || !user.userPrincipalName) {
       console.error('Could not extract userPrincipalName from Graph API response for user ID:', userId);
@@ -176,7 +173,6 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
       .filter((group: any) => group['@odata.type'] === '#microsoft.graph.group')
       .map((group: any) => group.displayName.toLowerCase());
 
-    console.log('User roles from Microsoft Graph:', roles);
     return {
       id: user.userPrincipalName,
       roles: roles
@@ -245,9 +241,7 @@ export async function getUserDirectReports(token: string, userIdOrUpn?: string):
         console.error('[getUserDirectReports] Could not extract user ID from provided token when userIdOrUpn is not specified.');
         return [];
       }
-      console.log(`[getUserDirectReports] Fetching reports for user from token (me): ${targetUserId}`);
     } else {
-      console.log(`[getUserDirectReports] Fetching reports for specified user: ${targetUserId}`);
     }
 
     const endpoint = `https://graph.microsoft.com/v1.0/users/${targetUserId}/directReports?$select=id,displayName,userPrincipalName`;
@@ -339,8 +333,6 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: NextApiRespon
       }
 
       // DEBUGGING: Log types and values before the query
-      console.log('[AuthMiddleware] Employee Validation - Type of selectedEmployeeId:', typeof selectedEmployeeId, 'Value:', selectedEmployeeId);
-      console.log('[AuthMiddleware] Employee Validation - Type of userData.id:', typeof userData.id, 'Value:', userData.id);
 
       // Verify selected employee belongs to user
       const employeeCheck = await executeQuery(
@@ -360,7 +352,6 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: NextApiRespon
           code: 'INVALID_EMPLOYEE'
         });
       } else {
-        console.log('[AuthMiddleware] Employee validation SUCCESSFUL.');
       }
 
       // Attach user data and selected employee to request

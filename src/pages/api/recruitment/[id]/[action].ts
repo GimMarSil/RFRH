@@ -64,7 +64,6 @@ export default async function handler(req, res) {
   let client;
   try {
     client = await pool.connect();
-    console.log('Successfully connected to PostgreSQL for action:', action);
 
     if (action === 'approve') {
       const query = `
@@ -80,7 +79,6 @@ export default async function handler(req, res) {
       if (result.rowCount === 0) {
         return res.status(404).json({ message: 'Request not found, already processed, or no changes made.' });
       }
-      console.log(`Request ${id} approved successfully by ${performingUserName}`);
       return res.status(200).json({ success: true, message: 'Pedido aprovado com sucesso.' });
 
     } else if (action === 'reject') {
@@ -101,7 +99,6 @@ export default async function handler(req, res) {
       if (result.rowCount === 0) {
         return res.status(404).json({ message: 'Request not found, already processed, or no changes made.' });
       }
-      console.log(`Request ${id} rejected successfully by ${performingUserName}`);
       return res.status(200).json({ success: true, message: 'Pedido rejeitado com sucesso.' });
     }
   } catch (error) {

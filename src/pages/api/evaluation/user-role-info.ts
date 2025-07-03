@@ -245,7 +245,6 @@ export default async function handler(
       }
     } catch (managerError: any) {
         if (managerError.message && managerError.message.includes('404')) {
-            console.log(`User ${loggedInUserAzureAdId} does not have a manager in Azure AD.`);
         } else {
             console.error('Error fetching manager from Graph:', managerError);
         }

@@ -55,12 +55,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'userId é obrigatório' });
     }
     try {
-      console.log('Attempting to connect to database...');
       const result = await pool.query(
         `SELECT * FROM recruitment WHERE responsible_identification = $1 ORDER BY request_date DESC`,
         [userId]
       );
-      console.log('Query successful, found', result.rows.length, 'records');
       return res.status(200).json(result.rows);
     } catch (error) {
       console.error('Erro ao buscar pedidos de recrutamento:', error);
@@ -74,7 +72,6 @@ export default async function handler(req, res) {
     }
   } else if (req.method === 'POST') {
     const data = req.body;
-    console.log('POST /api/recruitment payload:', data);
 
     try {
       const query = `
@@ -129,7 +126,6 @@ export default async function handler(req, res) {
         data.user_id || data.created_by || data.responsible_identification || null
       ];
       const result = await pool.query(query, values);
-      console.log('Inserted recruitment:', result.rows[0]);
       // Gravar log de criação
       await pool.query(
         `INSERT INTO recruitment_log (recruitment_id, action, changed_by, old_data, new_data) VALUES ($1, $2, $3, $4, $5)`,

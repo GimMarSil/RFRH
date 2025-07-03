@@ -135,7 +135,6 @@ export default async function handler(req, res) {
     await client.query('BEGIN'); // Start transaction
 
     await client.query(schemaManagementQueries);
-    console.log('Schema for recruitment, logs, and admission tables verified/updated.');
 
     // Create candidates table separately
     await client.query(`
@@ -166,7 +165,6 @@ export default async function handler(req, res) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log('Ensured candidates table exists.');
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS candidates_log (
@@ -179,7 +177,6 @@ export default async function handler(req, res) {
         new_data JSONB NULL
       );
     `);
-    console.log('Ensured candidates_log table exists.');
 
     await client.query('COMMIT'); // Commit transaction
     res.status(200).json({ success: true, message: 'All tables (recruitment, logs, admission, candidates) verified/updated successfully.' });

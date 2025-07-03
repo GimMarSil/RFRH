@@ -1,5 +1,6 @@
 import { LogLevel } from "@azure/msal-browser";
 
+
 export const msalConfig = {
     auth: {
         clientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID,

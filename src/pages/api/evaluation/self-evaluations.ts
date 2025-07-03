@@ -27,7 +27,6 @@ async function getSelectedEmployeeId(req: NextApiRequest): Promise<string | null
     console.warn('X-Selected-Employee-ID header not found for self-evaluations API. This is critical.');
     return null;
   }
-  console.log(`Retrieved selectedEmployeeId: ${selectedEmployeeId} from header for self-evaluations API.`);
   return selectedEmployeeId;
 }
 

@@ -198,7 +198,6 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
           );
           authorizedSubordinateEmployeeNumbers = subordinatesQuery.rows.map(r => r.employee_number.toString());
         }
-        console.log(`[POST Matrix Auth] Acting manager UPN: ${actingManagerProfileUpn} has authorized subordinate employee_numbers:`, authorizedSubordinateEmployeeNumbers);
       } catch (graphError) {
         console.error('[POST Matrix Auth] Failed to fetch direct reports from Graph API:', graphError);
         return res.status(500).json({ message: 'Failed to retrieve subordinate data for authorization.', details: graphError.message });
@@ -208,13 +207,11 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
       const unauthorizedRequestedIds = requestedSubordinateIds.filter(id => !authorizedSubordinateEmployeeNumbers.includes(id));
 
       if (unauthorizedRequestedIds.length > 0) {
-        console.log(`[POST Matrix Auth] Unauthorized subordinate IDs requested:`, unauthorizedRequestedIds);
         return res.status(403).json({ 
           message: `User (${actingManagerProfileUpn}) is not authorized for some requested subordinate employee IDs.`,
           unauthorized_ids: unauthorizedRequestedIds 
         });
       }
-      console.log(`[POST Matrix Auth] All requested subordinate employee_ids are authorized for manager ${actingManagerProfileUpn}.`);
 
       // If we reach here, authorization passed.
       await client.query('BEGIN');
