@@ -1,13 +1,14 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import MatrixForm from '../../components/evaluation/MatrixForm'; // Adjusted path
+import MatrixForm from '../../components/evaluation/MatrixForm';
+import MatrixTable from '../../components/evaluation/MatrixTable';
+import ApplicationsModal from '../../components/evaluation/ApplicationsModal';
+import ConfirmInactivateModal from '../../components/evaluation/ConfirmInactivateModal';
+import ApplyMatrixModal from '../../components/evaluation/ApplyMatrixModal';
 import { toast } from 'react-toastify';
-import { PlusIcon, PencilSquareIcon, DocumentDuplicateIcon, TrashIcon, CalendarDaysIcon, ClipboardDocumentListIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
-import { useSelectedEmployee } from '../../contexts/SelectedEmployeeContext'; // Added
-import { fetchWithAuth } from '../../lib/apiClient'; // Added
-import { logger } from '@/lib/logger';
-import { InteractionStatus, type AccountInfo } from '@azure/msal-browser'; // Added for enum usage
-import { Dialog, Transition } from '@headlessui/react';
+import { useSelectedEmployee } from '../../contexts/SelectedEmployeeContext';
+import { fetchWithAuth } from '../../lib/apiClient';
+import { InteractionStatus, type AccountInfo } from '@azure/msal-browser';
 import { useRouter } from 'next/router';
 
 // Types (assuming they might be shared later, keeping here for now)
@@ -635,271 +636,64 @@ export default function EvaluationMatricesPage() {
         <title>Matrizes de Avaliação</title>
       </Head>
       <div className="container mx-auto p-4 md:p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Matrizes de Avaliação</h1>
-          {selectedEmployeeId && isManager && subordinates && subordinates.length > 0 && (
-            <button 
-              onClick={handleOpenNewMatrixForm}
-              className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition duration-150 flex items-center"
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              Nova Matriz
-            </button>
-          )}
-          {selectedEmployeeId && isManager && (!subordinates || subordinates.length === 0) && !isLoading && (
-             <p className="text-sm text-gray-600">Você é um gestor, mas não tem subordinados diretos associados no momento.</p>
-          )}
-           {selectedEmployeeId && !isManager && !isLoading && (
-             <p className="text-sm text-gray-600">Apenas gestores com subordinados podem criar novas matrizes.</p>
-          )}
-        </div>
-        
-        {error && showFormModal && <p className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-md">{error}</p>}
+        {error && showFormModal && (
+          <p className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-md">{error}</p>
+        )}
 
-        <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validade</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {matrices.length === 0 && !isLoading && selectedEmployeeId ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                    Nenhuma matriz de avaliação encontrada.
-                  </td>
-                </tr>
-              ) : matrices.length === 0 && !isLoading && !selectedEmployeeId ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                    Por favor, selecione um perfil de funcionário para carregar as matrizes.
-                  </td>
-                </tr>
-              ) : (
-                matrices.map((matrix) => (
-                  <tr key={matrix.id || matrix.matrix_id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{matrix.title}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-xs">{matrix.description || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(matrix.valid_from)} - {formatDate(matrix.valid_to)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{matrix.employee?.CompanyName || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{matrix.employee?.Number || matrix.employee_id || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{matrix.employee?.Name || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${matrix.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
-                      `}>
-                        {matrix.status === 'active' ? 'Ativa' : 'Inativa'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-1">
-                      <button 
-                        onClick={() => handleEditMatrix(matrix)} 
-                        className="text-indigo-600 hover:text-indigo-900 p-1" 
-                        title="Editar" 
-                        disabled={!selectedEmployeeId || !(matrix.id || matrix.matrix_id)}
-                      >
-                        <PencilSquareIcon className="h-5 w-5" />
-                      </button>
-                      <button 
-                        onClick={() => handleShowApplications(matrix)} 
-                        className="text-blue-600 hover:text-blue-900 p-1" 
-                        title="Ver Aplicações" 
-                        disabled={!selectedEmployeeId || !(matrix.id || matrix.matrix_id)}
-                      >
-                        <ClipboardDocumentListIcon className="h-5 w-5" />
-                      </button>
-                      <button 
-                        onClick={() => handleCopyMatrix(matrix)} 
-                        className="text-gray-500 hover:text-gray-700 p-1" 
-                        title="Copiar e Prorrogar" 
-                        disabled={!selectedEmployeeId || !(matrix.id || matrix.matrix_id)} // Also disable if original has no ID
-                      >
-                        <CalendarDaysIcon className="h-5 w-5" />
-                      </button>
-                      <button 
-                        onClick={() => {
-                          const idToDel = matrix.id || matrix.matrix_id;
-                          if (idToDel && idToDel !== "undefined") {
-                            handleDeleteMatrix(idToDel);
-                          } else {
-                            logger.error("ID inválido no botão Apagar:", matrix);
-                            toast.error("Erro: ID da matriz inválido para apagar.");
-                          }
-                        }}
-                        className="text-red-600 hover:text-red-900 p-1" 
-                        title="Inativar" 
-                        disabled={!selectedEmployeeId || !(matrix.id || matrix.matrix_id) || matrix.id === "undefined" || matrix.matrix_id === "undefined"}
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-              {isLoading && (
-                  <tr><td colSpan={6} className="text-center p-4 text-sm text-gray-500">Carregando...</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <MatrixTable
+          matrices={matrices}
+          isLoading={isLoading}
+          selectedEmployeeId={selectedEmployeeId}
+          isManager={isManager}
+          subordinates={subordinates}
+          onNewMatrix={handleOpenNewMatrixForm}
+          onEdit={handleEditMatrix}
+          onShowApplications={handleShowApplications}
+          onCopy={handleCopyMatrix}
+          onDelete={handleDeleteMatrix}
+          formatDate={formatDate}
+        />
 
         {showFormModal && (
-          <MatrixForm 
+          <MatrixForm
             matrix={editingMatrix}
             onClose={() => {
               setShowFormModal(false);
               setEditingMatrix(null);
-              setSelectedApplicableEmployees([]); // Clear selection on close
-              setError(null); // Clear form-specific error on close
+              setSelectedApplicableEmployees([]);
+              setError(null);
             }}
             onSave={handleSaveMatrix}
-            subordinatesList={subordinates} // Pass subordinates
-            selectedApplicableEmployeeIds={selectedApplicableEmployees} // Pass selected IDs
-            onSelectedApplicableEmployeesChange={setSelectedApplicableEmployees} // Pass setter
+            subordinatesList={subordinates}
+            selectedApplicableEmployeeIds={selectedApplicableEmployees}
+            onSelectedApplicableEmployeesChange={setSelectedApplicableEmployees}
           />
         )}
 
-        <Transition.Root show={showApplicationsModal} as={React.Fragment}>
-          <Dialog as="div" className="relative z-10" onClose={() => setShowApplicationsModal(false)}>
-            <Transition.Child
-              as={React.Fragment}
-              enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100"
-              leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-            </Transition.Child>
-            <div className="fixed inset-0 z-10 overflow-y-auto">
-              <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                <Transition.Child
-                  as={React.Fragment}
-                  enter="ease-out duration-300" enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enterTo="opacity-100 translate-y-0 sm:scale-100"
-                  leave="ease-in duration-200" leaveFrom="opacity-100 translate-y-0 sm:scale-100" leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                  <Dialog.Panel className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-2xl sm:w-full sm:p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                        Aplicações da Matriz: {selectedMatrixForApps?.title}
-                      </Dialog.Title>
-                      <button onClick={() => setShowApplicationsModal(false)} className="text-gray-400 hover:text-gray-600">
-                        <span className="sr-only">Fechar</span>
-                        ×
-                      </button>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Colaborador</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Validade</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {applications.length === 0 ? (
-                            <tr><td colSpan={4} className="text-center py-4 text-gray-500">Nenhuma aplicação encontrada.</td></tr>
-                          ) : (
-                            applications.map(app => (
-                              <tr key={app.id}>
-                                <td className="px-4 py-2 whitespace-nowrap">{app.employee_name || app.employee_id}</td>
-                                <td className="px-4 py-2 whitespace-nowrap">{formatDate(app.valid_from)} - {formatDate(app.valid_to)}</td>
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                  <span className={
-                                    getApplicabilityStatus(app) === 'Ativa' ? 'text-green-700 font-semibold' :
-                                    getApplicabilityStatus(app) === 'Expirada' ? 'text-yellow-700 font-semibold' :
-                                    'text-red-700 font-semibold'
-                                  }>
-                                    {getApplicabilityStatus(app)}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                  <button onClick={() => handleNewVersionForCollaborator(app)} className="text-indigo-600 hover:text-indigo-900 p-1" title="Nova versão para este colaborador">
-                                    <ArrowPathIcon className="h-5 w-5" />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </Dialog.Panel>
-                </Transition.Child>
-              </div>
-            </div>
-          </Dialog>
-        </Transition.Root>
+        <ApplicationsModal
+          open={showApplicationsModal}
+          onClose={() => setShowApplicationsModal(false)}
+          matrix={selectedMatrixForApps}
+          applications={applications}
+          formatDate={formatDate}
+          getStatus={getApplicabilityStatus}
+          onNewVersion={handleNewVersionForCollaborator}
+        />
 
-        <Transition.Root show={confirmInactivate.open} as={React.Fragment}>
-          <Dialog as="div" className="relative z-50" onClose={() => setConfirmInactivate({ app: null, open: false })}>
-            <Transition.Child as={React.Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-            </Transition.Child>
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <Transition.Child as={React.Fragment} enter="ease-out duration-300" enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enterTo="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 translate-y-0 sm:scale-100" leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                <Dialog.Panel className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
-                  <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">Inativar aplicação?</Dialog.Title>
-                  <p className="mb-4">Esta ação irá inativar esta aplicação de matriz. Deseja continuar?</p>
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => setConfirmInactivate({ app: null, open: false })} className="px-4 py-2 rounded bg-gray-200 text-gray-700">Cancelar</button>
-                    <button onClick={confirmInactivateApplicability} className="px-4 py-2 rounded bg-red-600 text-white">Inativar</button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </Dialog>
-        </Transition.Root>
+        <ConfirmInactivateModal
+          open={confirmInactivate.open}
+          onCancel={() => setConfirmInactivate({ app: null, open: false })}
+          onConfirm={confirmInactivateApplicability}
+        />
 
-        {applyMatrixModal.open && (
-          <Transition.Root show={applyMatrixModal.open} as={React.Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={() => setApplyMatrixModal(false)}>
-              <Transition.Child as={React.Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-              </Transition.Child>
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <Transition.Child as={React.Fragment} enter="ease-out duration-300" enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enterTo="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 translate-y-0 sm:scale-100" leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                  <Dialog.Panel className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
-                    <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">Aplicar Nova Matriz</Dialog.Title>
-                    <form onSubmit={async e => {
-                      e.preventDefault();
-                      const form = e.target as HTMLFormElement;
-                      const employeeIds = [form.employee_id.value];
-                      const validFrom = form.valid_from.value;
-                      const validTo = form.valid_to.value;
-                      await handleSubmitApplyMatrix({ employeeIds, validFrom, validTo });
-                    }}>
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Colaborador</label>
-                        <input name="employee_id" className="w-full border rounded px-2 py-1" value={applyMatrixModal.employee_id || ''} readOnly />
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Válido de</label>
-                        <input name="valid_from" type="date" className="w-full border rounded px-2 py-1" defaultValue={applyMatrixModal.valid_from || ''} required />
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Válido até</label>
-                        <input name="valid_to" type="date" className="w-full border rounded px-2 py-1" defaultValue={applyMatrixModal.valid_to || ''} required />
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <button type="button" onClick={() => setApplyMatrixModal(false)} className="px-4 py-2 rounded bg-gray-200 text-gray-700">Cancelar</button>
-                        <button type="submit" className="px-4 py-2 rounded bg-green-600 text-white">Aplicar</button>
-                      </div>
-                    </form>
-                  </Dialog.Panel>
-                </Transition.Child>
-              </div>
-            </Dialog>
-          </Transition.Root>
-        )}
+        <ApplyMatrixModal
+          open={applyMatrixModal.open}
+          employee_id={applyMatrixModal.employee_id}
+          valid_from={applyMatrixModal.valid_from}
+          valid_to={applyMatrixModal.valid_to}
+          onClose={() => setApplyMatrixModal(false)}
+          onSubmit={handleSubmitApplyMatrix}
+        />
       </div>
     </>
   );
