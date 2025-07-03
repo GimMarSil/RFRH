@@ -45,6 +45,18 @@ interface Employee {
   department: string;
 }
 
+interface ApplyMatrixFormValues {
+  employeeIds: string[];
+  validFrom: string;
+  validTo: string;
+}
+
+interface CopyMatrixFormValues {
+  newValidFrom: string;
+  newValidTo: string;
+  employeeIds?: string[];
+}
+
 export const EvaluationMatrixManager: React.FC = () => {
   const [matrices, setMatrices] = useState<Matrix[]>([]);
   const [applicabilities, setApplicabilities] = useState<MatrixApplicability[]>([]);
@@ -97,7 +109,7 @@ export const EvaluationMatrixManager: React.FC = () => {
     }
   };
 
-  const handleApplyMatrix = async (values: any) => {
+  const handleApplyMatrix = async (values: ApplyMatrixFormValues) => {
     try {
       setLoading(true);
       const response = await fetch('/api/evaluation/matrix/apply', {
@@ -127,7 +139,7 @@ export const EvaluationMatrixManager: React.FC = () => {
     }
   };
 
-  const handleCopyMatrix = async (values: any) => {
+  const handleCopyMatrix = async (values: CopyMatrixFormValues) => {
     try {
       setLoading(true);
       const response = await fetch(`/api/evaluation/matrix/${selectedMatrix?.id}/copy`, {
