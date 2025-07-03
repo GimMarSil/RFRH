@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 require('dotenv').config({ path: '.env.local' });
 const { Client } = require('pg');
 
@@ -191,7 +192,7 @@ async function main() {
 
 
   } catch (err) {
-    console.error('Error creating tables:', err);
+    logger.error('Error creating tables:', err);
     process.exit(1);
   } finally {
     await pgClient.end();

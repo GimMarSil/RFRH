@@ -1,12 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextApiResponse } from 'next';
 import { withAuth, AuthenticatedRequest } from '../../../middleware/auth';
 import { isAdmin } from '../../../../lib/auth';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+import { pool } from '../../../../lib/db/pool';
 
 async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   if (!req.user) {
@@ -60,7 +56,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
       return;
     }
   } catch (error) {
-    console.error('Error in notifications API:', error);
+    logger.error('Error in notifications API:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
     return;
   } finally {

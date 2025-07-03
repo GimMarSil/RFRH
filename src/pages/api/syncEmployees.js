@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /*************************************************************
  * 💾 ENVIO DE FUNCIONÁRIOS                                 *
  * DA BASE DE DADOS SQL SERVER (interna da RF)              *
@@ -189,14 +190,14 @@ async function main() {
         ]);
         successCount++;
       } catch (err) {
-        console.error(`Error syncing employee ${emp.Number}:`, err);
+        logger.error(`Error syncing employee ${emp.Number}:`, err);
         errorCount++;
       }
     }
 
 
   } catch (err) {
-    console.error('Error during sync:', err);
+    logger.error('Error during sync:', err);
     process.exit(1);
   } finally {
     await sql.close();

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { getSession } from 'next-auth/react';
@@ -128,7 +129,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error copying matrix:', error);
+    logger.error('Error copying matrix:', error);
     return res.status(500).json({ message: 'Internal server error' });
   } finally {
     client.release();

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { withAuth, AuthenticatedRequest, isAdmin, getUserDirectReports } from '../../../middleware/auth';
@@ -49,7 +50,7 @@ async function canUserManageMatrix(
         return { authorized: true, matrix, creatorUpn };
       }
     } catch (error) {
-      console.error('Error fetching direct reports for matrix authorization:', error);
+      logger.error('Error fetching direct reports for matrix authorization:', error);
       // Potentially fall through or return a specific error if Graph call fails
       return { authorized: false, statusCode: 500, message: 'Could not verify manager relationship due to Graph API error.' };
     }
@@ -145,7 +146,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
 
       const validationResult = await validateMatrixInput({ title, description, valid_from, valid_to, criteria, employee_ids });
       if (!validationResult.success) {
-        console.error("PUT /matrixId validation error:", validationResult.errors);
+        logger.error("PUT /matrixId validation error:", validationResult.errors);
         res.status(400).json({ message: 'Invalid input', errors: validationResult.errors });
         return;
       }
@@ -295,7 +296,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
     if (client) {
       await client.query('ROLLBACK');
     }
-    console.error(`Error in /api/evaluation-matrices/${matrixId} API:`, error);
+    logger.error(`Error in /api/evaluation-matrices/${matrixId} API:`, error);
     if (error.code === '23503') { // foreign key violation
         res.status(409).json({ message: 'Conflict: Operation violates data integrity. The matrix might be in use.', details: error.detail });
     } else {

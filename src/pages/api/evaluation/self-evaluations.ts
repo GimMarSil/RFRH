@@ -1,15 +1,11 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Pool } from 'pg';
 import { withAuth, AuthenticatedRequest, getUserManager } from '../../../middleware/auth';
 import { withErrorHandler, ValidationError, NotFoundError, AuthorizationError } from '../../../lib/errors';
-import { executeQuery, executeTransaction } from '../../../lib/db/pool';
+import { pool, executeQuery, executeTransaction } from '../../../lib/db/pool';
 import { z } from 'zod';
 
-// TODO: Ideally, use a shared DB pool module
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }, // Adjust based on your DB hosting requirements
-});
+// Using shared database pool instance from lib/db/pool
 
 // Helper to get authenticated user ID (replace with your actual auth logic)
 async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string | null> {
@@ -26,7 +22,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 

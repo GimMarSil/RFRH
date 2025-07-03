@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import sql from 'mssql';
 
 const sqlConfig = {
@@ -90,8 +91,8 @@ export default async function handler(req, res) {
 
     res.status(200).json(result.recordset);
   } catch (error) {
-    console.error('Database error:', error);
-    console.error('Error details:', {
+    logger.error('Database error:', error);
+    logger.error('Error details:', {
       code: error.code,
       message: error.message,
       stack: error.stack,

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as jose from 'jose';
 import sql from 'mssql';
@@ -71,7 +72,7 @@ const AUDIENCE = process.env.AZURE_AD_API_AUDIENCE; // This should be the client
 
 async function validateUserToken(token: string): Promise<jose.JWTPayload | null> {
   if (!AZURE_AD_TENANT_ID || !AUDIENCE) {
-    console.error('Backend: Missing Azure AD config for user token validation (TENANT_ID, API_AUDIENCE).');
+    logger.error('Backend: Missing Azure AD config for user token validation (TENANT_ID, API_AUDIENCE).');
     return null;
   }
   try {
@@ -79,7 +80,7 @@ async function validateUserToken(token: string): Promise<jose.JWTPayload | null>
     const { payload } = await jose.jwtVerify(token, JWKS, { issuer: ISSUER, audience: AUDIENCE });
     return payload;
   } catch (error: any) {
-    console.error('User token validation error:', error.message);
+    logger.error('User token validation error:', error.message);
     return null;
   }
 }
@@ -90,7 +91,7 @@ async function getGraphToken(): Promise<string | null> {
     const authResult = await cca.acquireTokenByClientCredential({ scopes: GRAPH_SCOPES });
     return authResult?.accessToken || null;
   } catch (error) {
-    console.error('Failed to acquire Graph token by client credential:', error);
+    logger.error('Failed to acquire Graph token by client credential:', error);
     return null;
   }
 }
@@ -117,7 +118,7 @@ async function getEmployeeFromDbByUpn(userPrincipalName: string): Promise<any | 
       .query`SELECT [Number] AS EmployeeId, Name, Email, UserId FROM [RFWebApp].[dbo].[Employee] WHERE UserId = @userPrincipalName`;
     return result.recordset[0] || null;
   } catch (dbError) {
-    console.error(`DB error fetching employee by UPN ${userPrincipalName}:`, dbError);
+    logger.error(`DB error fetching employee by UPN ${userPrincipalName}:`, dbError);
     return null;
   }
 }
@@ -159,7 +160,7 @@ async function getEmployeesFromDbByUpns(userPrincipalNames: string[]): Promise<D
     const result = await request.query(query);
     return result.recordset as DbEmployeeDetails[];
   } catch (dbError) {
-    console.error(`DB error fetching employees by UPNs:`, dbError);
+    logger.error(`DB error fetching employees by UPNs:`, dbError);
     return []; 
   }
 }
@@ -246,7 +247,7 @@ export default async function handler(
     } catch (managerError: any) {
         if (managerError.message && managerError.message.includes('404')) {
         } else {
-            console.error('Error fetching manager from Graph:', managerError);
+            logger.error('Error fetching manager from Graph:', managerError);
         }
     }
 
@@ -265,7 +266,7 @@ export default async function handler(
     });
 
   } catch (err: any) {
-    console.error('API Error processing user role info with Graph:', err);
+    logger.error('API Error processing user role info with Graph:', err);
     await sql.close();
     return res.status(500).json({ 
       error: 'Internal Server Error', 

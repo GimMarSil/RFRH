@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { canAccessMatrix, canManageMatrix } from '../../../../lib/evaluation/auth';
@@ -24,7 +25,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 
@@ -278,7 +279,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
     if (client) {
       await client.query('ROLLBACK');
     }
-    console.error('Error in matrix API:', error);
+    logger.error('Error in matrix API:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
     return;
   } finally {

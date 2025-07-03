@@ -26,7 +26,6 @@ The following variables are referenced in the code base:
 - `SQL_PASSWORD`
 - `SQL_SERVER`
 - `SQL_USER`
-- `DATABASE_URL`
 
 Refer to that file when creating your own `.env.local`.
 

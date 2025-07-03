@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { LogLevel } from "@azure/msal-browser";
 
 
@@ -21,7 +22,7 @@ export const msalConfig = {
                 }
                 switch (level) {
                     case LogLevel.Error:
-                        console.error(message);
+                        logger.error(message);
                         return;
                     case LogLevel.Info:
                         return;

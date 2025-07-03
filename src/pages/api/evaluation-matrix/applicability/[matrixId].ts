@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 
@@ -21,9 +22,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const result = await client.query(
-      `SELECT e.id, e.name, e.email, e.position, e.department
+      `SELECT e.employee_number, e.name, e.email, e.position, e.department
        FROM employees e
-       INNER JOIN evaluation_matrix_applicability ema ON e.id = ema.employee_id
+       INNER JOIN evaluation_matrix_applicability ema ON e.employee_number = ema.employee_id
        WHERE ema.matrix_id = $1
        ORDER BY e.name`,
       [matrixId]
@@ -31,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(result.rows);
   } catch (error) {
-    console.error('Error fetching matrix applicability:', error);
+    logger.error('Error fetching matrix applicability:', error);
     return res.status(500).json({ message: 'Internal server error' });
   } finally {
     client.release();

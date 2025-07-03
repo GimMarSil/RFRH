@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pgPool = new Pool({
@@ -199,8 +200,8 @@ export default async function handler(req, res) {
     res.status(200).json({ message: 'Tables created successfully' });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error creating tables:', error);
-    console.error('Error details:', {
+    logger.error('Error creating tables:', error);
+    logger.error('Error details:', {
       message: error.message,
       code: error.code,
       detail: error.detail,

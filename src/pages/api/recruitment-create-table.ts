@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -182,7 +183,7 @@ export default async function handler(req, res) {
     res.status(200).json({ success: true, message: 'All tables (recruitment, logs, admission, candidates) verified/updated successfully.' });
   } catch (error) {
     await client.query('ROLLBACK'); // Rollback transaction on error
-    console.error('Erro ao criar/atualizar tabelas:', error);
+    logger.error('Erro ao criar/atualizar tabelas:', error);
     res.status(500).json({ success: false, error: error.message });
   } finally {
     client.release(); // Release client

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
     );
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error('Erro ao buscar histórico:', error);
+    logger.error('Erro ao buscar histórico:', error);
     res.status(500).json({ message: 'Erro ao buscar histórico', error: error.message });
   }
 }

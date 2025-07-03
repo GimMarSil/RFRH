@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelectedEmployee } from '@/contexts/SelectedEmployeeContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Header from './Header';
+import { logger } from '@/lib/logger';
 
 interface Employee {
   employee_number: number;
@@ -39,10 +40,10 @@ const AppLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
             }
           }
         } else {
-          console.error('Failed to fetch employees');
+          logger.error('Failed to fetch employees');
         }
       } catch (err) {
-        console.error(err);
+        logger.error(err);
       } finally {
         setLoading(false);
       }

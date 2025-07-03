@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { cca, GRAPH_SCOPES } from './msalConfig'; // Import shared MSAL config
 
 export interface GraphUser {
@@ -13,7 +14,7 @@ export async function getGraphToken(): Promise<string | null> {
     const authResult = await cca.acquireTokenByClientCredential({ scopes: GRAPH_SCOPES });
     return authResult?.accessToken || null;
   } catch (error) {
-    console.error('Failed to acquire Graph token by client credential:', error);
+    logger.error('Failed to acquire Graph token by client credential:', error);
     return null;
   }
 }
@@ -26,7 +27,7 @@ export async function fetchFromGraph(graphToken: string, url: string): Promise<a
   if (!response.ok) {
     const errorText = await response.text();
     // Consider how to handle Graph API errors more gracefully or specifically if needed
-    console.error(`Graph API error: ${response.status} ${response.statusText} - ${errorText} for URL: ${url}`);
+    logger.error(`Graph API error: ${response.status} ${response.statusText} - ${errorText} for URL: ${url}`);
     throw new Error(`Graph API error: ${response.status} ${response.statusText}`);
   }
   try {
@@ -34,7 +35,7 @@ export async function fetchFromGraph(graphToken: string, url: string): Promise<a
   } catch (e) {
     // Handle cases where response might be ok but not JSON (e.g. 204 No Content for directReports if no one reports)
     if (response.status === 204) return { value: [] }; // Mimic Graph's empty value array for consistency
-    console.error('Failed to parse Graph API JSON response:', e);
+    logger.error('Failed to parse Graph API JSON response:', e);
     throw new Error('Failed to parse Graph API JSON response.');
   }
 }
@@ -48,7 +49,7 @@ export async function getDirectGraphSubordinates(userAzureAdId: string): Promise
   
   const graphToken = await getGraphToken();
   if (!graphToken) {
-    console.error('getDirectGraphSubordinates: Failed to get Graph token.');
+    logger.error('getDirectGraphSubordinates: Failed to get Graph token.');
     // Depending on desired error handling, you might throw here or return empty
     return []; 
   }
@@ -62,7 +63,7 @@ export async function getDirectGraphSubordinates(userAzureAdId: string): Promise
     return (graphSubordinatesData?.value as GraphUser[]) || [];
   } catch (error) {
     // Log the specific error from fetchFromGraph (which already logs details)
-    console.error(`getDirectGraphSubordinates: Error fetching direct reports for AAD user ${userAzureAdId}:`, error.message);
+    logger.error(`getDirectGraphSubordinates: Error fetching direct reports for AAD user ${userAzureAdId}:`, error.message);
     return []; // Return empty array on error to allow checks like .length > 0 to fail gracefully
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import sql from 'mssql';
 
 // Ensure these environment variables are set in your .env.local or environment
@@ -40,7 +41,7 @@ export async function getEmployeeUpnFromNumber(employeeNumber: string): Promise<
       return null;
     }
   } catch (dbError) {
-    console.error(`DB error in getEmployeeUpnFromNumber for employee number ${employeeNumber}:`, dbError);
+    logger.error(`DB error in getEmployeeUpnFromNumber for employee number ${employeeNumber}:`, dbError);
     return null; 
   } finally {
     if (pool) {
@@ -69,14 +70,14 @@ export async function getAzureADObjectIdFromUpn(upn: string): Promise<string | n
   if (!upn) return null;
   const graphToken = await getGraphToken();
   if (!graphToken) {
-    console.error('getAzureADObjectIdFromUpn: Failed to get graph token.');
+    logger.error('getAzureADObjectIdFromUpn: Failed to get graph token.');
     return null;
   }
   try {
     const graphUser = await fetchFromGraph(graphToken, `https://graph.microsoft.com/v1.0/users/${upn}?$select=id`);
     return graphUser?.id || null;
   } catch (error) {
-    console.error(`Error fetching AAD Object ID for UPN ${upn} from Graph:`, error);
+    logger.error(`Error fetching AAD Object ID for UPN ${upn} from Graph:`, error);
     return null;
   }
 }
@@ -91,7 +92,7 @@ export async function getAllActiveEmployees() {
     // Retorna um array de objetos { Number, CompanyName, Name }
     return result.recordset;
   } catch (dbError) {
-    console.error('DB error in getAllActiveEmployees:', dbError);
+    logger.error('DB error in getAllActiveEmployees:', dbError);
     return [];
   } finally {
     if (pool) {
@@ -132,7 +133,7 @@ export async function getEmployeeDetailsByUserId(userId: string) {
       `);
     return result.recordset[0];
   } catch (err) {
-    console.error('Error fetching employee data from SQL Server:', err);
+    logger.error('Error fetching employee data from SQL Server:', err);
     return null;
   }
 }
@@ -149,7 +150,7 @@ export async function getEmployeeDetailsByNumber(number: string) {
       `);
     return result.recordset[0];
   } catch (err) {
-    console.error('Error fetching employee data from SQL Server:', err);
+    logger.error('Error fetching employee data from SQL Server:', err);
     return null;
   }
 }
