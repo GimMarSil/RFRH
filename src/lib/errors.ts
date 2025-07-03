@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiResponse } from 'next';
 
 // Custom error classes
@@ -56,7 +57,7 @@ export function sendError(res: NextApiResponse, error: Error | AppError) {
   }
 
   // Handle unexpected errors
-  console.error('Unexpected error:', error);
+  logger.error('Unexpected error:', error);
   return res.status(500).json({
     error: 'InternalServerError',
     code: 'INTERNAL_ERROR',

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { withAuth, AuthenticatedRequest, getUserManager } from '../../../middleware/auth';
@@ -26,7 +27,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 

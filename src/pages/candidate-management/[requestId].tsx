@@ -8,6 +8,7 @@ import { ArrowLeft, Briefcase, Users, Building2, FileText, CalendarDays, Info, C
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -224,7 +225,7 @@ export default function CandidateManagementPage() {
       const data = await res.json();
       setCandidatesByStage(prev => ({ ...prev, [stageId]: data }));
     } catch (err: any) {
-      console.error(`Erro ao buscar candidatos para ${stageId}:`, err);
+      logger.error(`Erro ao buscar candidatos para ${stageId}:`, err);
       setCandidatesByStage(prev => ({ ...prev, [stageId]: [] })); // Set to empty array on error
     } finally {
       setLoadingCandidates(prev => ({ ...prev, [stageId]: false }));
@@ -257,7 +258,7 @@ export default function CandidateManagementPage() {
       return;
     }
     
-    console.log(`Candidate ${candidateId} dragged from stage ${sourceStageId} (index ${source.index}) to stage ${destStageId} (index ${destination.index})`);
+    logger.log(`Candidate ${candidateId} dragged from stage ${sourceStageId} (index ${source.index}) to stage ${destStageId} (index ${destination.index})`);
 
     // Optimistically update UI
     setCandidatesByStage(prev => {
@@ -310,10 +311,10 @@ export default function CandidateManagementPage() {
         const errorResult = await res.json().catch(() => ({ message: "Failed to update candidate stage on server." }));
         throw new Error(errorResult.message);
       }
-      console.log(`Candidate ${candidateId} stage updated to ${newStage} on server.`);
+      logger.log(`Candidate ${candidateId} stage updated to ${newStage} on server.`);
       // Optionally, show a success toast or notification
     } catch (error: any) {
-      console.error("Error updating candidate stage on server:", error);
+      logger.error("Error updating candidate stage on server:", error);
       // Revert optimistic update if API call fails?
       // This can be complex, for now, we log error and might show a toast.
       // Consider re-fetching candidates for source/destination stages to ensure consistency.

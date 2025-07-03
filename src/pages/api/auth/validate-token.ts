@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ConfidentialClientApplication } from '@azure/msal-node';
 
@@ -46,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Graph API error:', {
+      logger.error('Graph API error:', {
         status: response.status,
         statusText: response.statusText,
         error: errorText
@@ -57,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userData = await response.json();
     return res.status(200).json({ id: userData.id });
   } catch (error) {
-    console.error('Token validation error:', error);
+    logger.error('Token validation error:', error);
     return res.status(401).json({ 
       error: 'Token validation failed',
       details: error instanceof Error ? error.message : 'Unknown error'

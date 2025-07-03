@@ -5,6 +5,7 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError, InteractionStatus, PublicClientApplication } from '@azure/msal-browser';
 import { fetchWithAuth, ApiClientOptions } from '@/lib/apiClient'; // Import fetchWithAuth
 import { useSelectedEmployee } from '@/contexts/SelectedEmployeeContext'; // Import the context hook
+import { logger } from '@/lib/logger';
 
 // Define your API scopes here - this should match the audience/scope configured for your backend API
 // e.g., ["api://your-backend-client-id/.default"] or specific permission scopes
@@ -67,7 +68,7 @@ const EvaluateSubordinatePage = () => {
 
       try {
         // No need to acquire token manually, fetchWithAuth handles it.
-        console.log("Fetching user role info...");
+        logger.log("Fetching user role info...");
         const data = await fetchWithAuth<UserRoleInfo>(
           '/api/evaluation/user-role-info',
           { method: 'GET' },
@@ -81,19 +82,19 @@ const EvaluateSubordinatePage = () => {
         setEmployeeProfileName(data.name); 
         setIsManagerRole(data.isManager);
 
-        console.log("Fetched User Info Subordinates:", data.subordinates);
-        console.log("Context updated: selectedEmployeeId:", data.employeeId, "systemUserId:", data.userId);
+        logger.log("Fetched User Info Subordinates:", data.subordinates);
+        logger.log("Context updated: selectedEmployeeId:", data.employeeId, "systemUserId:", data.userId);
 
       } catch (err: any) {
         if (err instanceof InteractionRequiredAuthError) {
           console.warn('Silent token acquisition failed via fetchWithAuth. Interaction required.');
-          console.error("InteractionRequiredAuthError details:", err); 
+          logger.error("InteractionRequiredAuthError details:", err);
           setError(`Falha na aquisição de token: ${err.message || err.errorMessage}. Interação pode ser necessária.`);
           // Potentially trigger interactive token acquisition here if not handled globally by msal-react or _app.tsx
-          // instance.acquireTokenRedirect({ scopes: apiScopes, account: accounts[0] }).catch(console.error);
+          // instance.acquireTokenRedirect({ scopes: apiScopes, account: accounts[0] }).catch(logger.error);
         } else {
           setError(err.message || 'Falha ao carregar informação do utilizador.');
-          console.error("Other error during user-role-info fetch:", err); 
+          logger.error("Other error during user-role-info fetch:", err);
         }
       } finally {
         setIsLoading(false);

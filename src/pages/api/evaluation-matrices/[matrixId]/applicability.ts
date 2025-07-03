@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 
@@ -21,7 +22,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 
@@ -59,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ message: 'Forbidden: Selected Employee ID required for this operation.' });
     }
   } catch (authError) {
-    console.error('Authentication error in matrix applicability API:', authError);
+    logger.error('Authentication error in matrix applicability API:', authError);
     return res.status(500).json({ message: 'Authentication failed.' });
   }
 
@@ -86,7 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         return res.status(200).json(result.rows);
       } catch (dbError) {
-        console.error(`Error fetching applicability for matrix ${matrixId}:`, dbError);
+        logger.error(`Error fetching applicability for matrix ${matrixId}:`, dbError);
         return res.status(500).json({ message: `Error fetching applicability`, error: dbError.message });
       }
     } else if (method === 'POST') {
@@ -148,7 +149,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(updatedApplicability.rows);
       } catch (dbError) {
         await client.query('ROLLBACK');
-        console.error(`Error adding applicability for matrix ${matrixId}:`, dbError);
+        logger.error(`Error adding applicability for matrix ${matrixId}:`, dbError);
         return res.status(500).json({ message: `Error adding applicability`, error: dbError.message });
       }
     } else if (method === 'DELETE') {
@@ -182,7 +183,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       } catch (dbError) {
         await client.query('ROLLBACK');
-        console.error(`Error removing applicability for matrix ${matrixId}:`, dbError);
+        logger.error(`Error removing applicability for matrix ${matrixId}:`, dbError);
         return res.status(500).json({ message: `Error removing applicability`, error: dbError.message });
       }
     } else {
@@ -190,7 +191,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(405).end(`Method ${method} Not Allowed for this route.`);
     }
   } catch (error) {
-    console.error('General API handler error in matrix applicability API:', error);
+    logger.error('General API handler error in matrix applicability API:', error);
     return res.status(500).json({ message: 'An unexpected error occurred in matrix applicability API.', error: error.message });
   } finally {
     if (client) client.release();

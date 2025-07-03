@@ -7,6 +7,7 @@ import { useFuncionario } from "../context/FuncionarioContext"; // Adjust path i
 import { useRouter } from "next/router";
 import Link from 'next/link'; // Added Link import
 import { useSelectedEmployee } from '@/contexts/SelectedEmployeeContext'; // Added
+import { logger } from '@/lib/logger';
 
 gsap.registerPlugin(Back);
 
@@ -113,7 +114,7 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     if (funcionarioSelecionado && typeof funcionarioSelecionado.employee_number === 'number') {
       const employeeIdStr = funcionarioSelecionado.employee_number.toString();
-      console.log(`[LandingPage] FuncionarioSelecionado valid, updating SelectedEmployeeContext with ID: ${employeeIdStr}`, funcionarioSelecionado);
+      logger.log(`[LandingPage] FuncionarioSelecionado valid, updating SelectedEmployeeContext with ID: ${employeeIdStr}`, funcionarioSelecionado);
       setSelectedEmployeeId(employeeIdStr);
       setEmployeeProfileName(funcionarioSelecionado.Name);
       
@@ -130,7 +131,7 @@ const LandingPage: React.FC = () => {
       setEmployeeProfileName(null);
       setIsManagerRole(false);
     } else {
-      console.log('[LandingPage] FuncionarioSelecionado deselected, clearing parts of SelectedEmployeeContext.');
+      logger.log('[LandingPage] FuncionarioSelecionado deselected, clearing parts of SelectedEmployeeContext.');
       setSelectedEmployeeId(null);
       setEmployeeProfileName(null);
       setIsManagerRole(false);

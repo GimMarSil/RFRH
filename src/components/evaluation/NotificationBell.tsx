@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
+import { logger } from '@/lib/logger';
 
 interface Notification {
   id: number;
@@ -38,7 +39,7 @@ export default function NotificationBell() {
       const data = await response.json();
       setNotifications(data);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error);
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +72,7 @@ export default function NotificationBell() {
         n.id === notification.id ? { ...n, status: 'read' } : n
       ));
     } catch (error) {
-      console.error('Error handling notification click:', error);
+      logger.error('Error handling notification click:', error);
     }
   };
 

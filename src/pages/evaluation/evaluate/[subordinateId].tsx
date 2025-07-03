@@ -5,6 +5,7 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionStatus, InteractionRequiredAuthError, PublicClientApplication } from '@azure/msal-browser';
 import { fetchWithAuth, ApiClientOptions } from '@/lib/apiClient';
 import { useSelectedEmployee } from '@/contexts/SelectedEmployeeContext';
+import { logger } from '@/lib/logger';
 
 // Placeholder interfaces - these would be defined based on your actual API response
 interface EvaluationCriterion {
@@ -70,7 +71,7 @@ const EvaluationFormPage = () => {
       };
 
       try {
-        console.log(`Fetching evaluation data for subordinate: ${subordinateId}, by manager: ${managerEmployeeId}`);
+        logger.log(`Fetching evaluation data for subordinate: ${subordinateId}, by manager: ${managerEmployeeId}`);
         // TODO: Replace with actual API endpoint and data structure
         // This endpoint would need to:
         // 1. Find or initiate an employee_evaluation for the subordinateId, managerEmployeeId, and current period/matrix.
@@ -84,7 +85,7 @@ const EvaluationFormPage = () => {
         );
         setEvaluationData(fetchedData);
       } catch (err: any) {
-        console.error("Error fetching evaluation details:", err);
+        logger.error("Error fetching evaluation details:", err);
         if (err instanceof InteractionRequiredAuthError) {
           setError("Sessão expirada ou requer interação. Por favor, tente autenticar novamente.");
           // Potentially trigger interactive login

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 if (!process.env.DATABASE_URL) {
@@ -20,7 +21,7 @@ export const pool = new Pool({
 
 // Handle pool errors
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  logger.error('Unexpected error on idle client', err);
   process.exit(-1);
 });
 
@@ -37,7 +38,7 @@ export async function executeQuery<T = any>(
     const result = await queryClient.query(query, params);
     return result.rows;
   } catch (error) {
-    console.error('Database query error:', error);
+    logger.error('Database query error:', error);
     throw error;
   } finally {
     if (shouldRelease) {

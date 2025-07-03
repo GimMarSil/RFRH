@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -6,7 +7,7 @@ const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  logger.error('Unexpected error on idle client', err);
   process.exit(-1);
 });
 
@@ -19,7 +20,7 @@ async function checkUserAuthorization(req): Promise<{ authorized: boolean; userI
   try {
     userGroups = JSON.parse(req.headers['x-user-groups'] || '[]');
   } catch (e) {
-    console.error("Error parsing user groups:", e);
+    logger.error("Error parsing user groups:", e);
   }
 
   if (!userId) return { authorized: false };
@@ -106,7 +107,7 @@ export default async function handler(req, res) {
           oldData
         ]);
       } catch (logError) {
-        console.error('Failed to log candidate update:', logError);
+        logger.error('Failed to log candidate update:', logError);
         // Not rolling back for logging failure, but logging the error
       }
 
@@ -115,7 +116,7 @@ export default async function handler(req, res) {
 
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error('Erro ao atualizar candidato:', error);
+      logger.error('Erro ao atualizar candidato:', error);
       if (error.code === '23505' && error.constraint && error.constraint.includes('email')) {
         return res.status(409).json({ message: 'Erro ao atualizar candidato: O email fornecido já existe para outro candidato.', error: error.message });
       }
@@ -136,7 +137,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'Candidato removido com sucesso.', deletedCandidate: result.rows[0] });
 
     } catch (error) {
-      console.error('Erro ao remover candidato:', error);
+      logger.error('Erro ao remover candidato:', error);
       return res.status(500).json({ message: 'Erro ao remover candidato', error: error.message });
     }
   } else {

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { canManageMatrix } from '../../../../lib/evaluation/auth';
@@ -23,7 +24,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 
@@ -58,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
   } catch (authError) {
-    console.error('Authentication error in matrices API:', authError);
+    logger.error('Authentication error in matrices API:', authError);
     return res.status(500).json({ message: 'Authentication failed.' });
   }
 
@@ -103,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(result.rows);
 
       } catch (dbError) {
-        console.error('Error fetching matrices:', dbError);
+        logger.error('Error fetching matrices:', dbError);
         return res.status(500).json({ message: 'Error fetching matrices', error: dbError.message });
       }
     } else if (method === 'POST') {
@@ -154,7 +155,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       } catch (dbError) {
         await client.query('ROLLBACK');
-        console.error('Error creating matrix:', dbError);
+        logger.error('Error creating matrix:', dbError);
         if (dbError.code === '23505') { // Unique violation
           return res.status(409).json({ message: 'A matrix with this title already exists.', code: dbError.code });
         }
@@ -165,7 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(405).end(`Method ${method} Not Allowed for this route.`);
     }
   } catch (error) {
-    console.error('General API handler error in matrices API:', error);
+    logger.error('General API handler error in matrices API:', error);
     return res.status(500).json({ message: 'An unexpected error occurred in matrices API.', error: error.message });
   } finally {
     if (client) client.release();

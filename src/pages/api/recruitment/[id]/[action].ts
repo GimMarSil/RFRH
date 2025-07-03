@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg'; // Assuming you have 'pg' installed
 // import { getToken } from 'next-auth/jwt'; // Keep if you plan to use it for more direct auth
 
@@ -30,7 +31,7 @@ async function checkUserAuthorization(req): Promise<{ authorized: boolean; userI
         return { authorized: true, userId, userName };
       }
     } catch (error) {
-      console.error("Error parsing user groups for authorization:", error);
+      logger.error("Error parsing user groups for authorization:", error);
       // Fall through to return not authorized
     }
   }
@@ -102,7 +103,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Pedido rejeitado com sucesso.' });
     }
   } catch (error) {
-    console.error(`Database error during ${action} action:`, error);
+    logger.error(`Database error during ${action} action:`, error);
     return res.status(500).json({ message: `Error processing request: ${error.message}` });
   } finally {
     if (client) {

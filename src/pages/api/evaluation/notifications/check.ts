@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiResponse } from 'next';
 import { withAuth, AuthenticatedRequest, isAdmin } from '../../../middleware/auth';
 import { runNotificationChecks } from '../../../lib/evaluation/notificationService';
@@ -22,7 +23,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
     await runNotificationChecks();
     res.status(200).json({ message: 'Notification checks completed successfully' });
   } catch (error) {
-    console.error('Error running notification checks:', error);
+    logger.error('Error running notification checks:', error);
     res.status(500).json({ message: 'Error running notification checks', error: error.message });
   }
 }
