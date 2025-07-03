@@ -10,16 +10,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  console.log('Starting table creation...');
-  console.log('Database URL:', process.env.DATABASE_URL ? 'Present' : 'Missing');
 
   const client = await pgPool.connect();
   try {
-    console.log('Connected to database successfully');
     await client.query('BEGIN');
 
     // Create employees table first
-    console.log('Creating employees table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS employees (
         id TEXT PRIMARY KEY,
@@ -35,10 +31,8 @@ export default async function handler(req, res) {
         updated_at TIMESTAMPTZ
       );
     `);
-    console.log('Employees table created successfully');
 
     // Create evaluation matrices table
-    console.log('Creating evaluation matrices table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS evaluation_matrices (
         id SERIAL PRIMARY KEY,
@@ -54,10 +48,8 @@ export default async function handler(req, res) {
         CONSTRAINT valid_date_range CHECK (valid_from <= valid_to)
       );
     `);
-    console.log('Evaluation matrices table created successfully');
 
     // Create evaluation criteria table
-    console.log('Creating evaluation criteria table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS evaluation_criteria (
         id SERIAL PRIMARY KEY,
@@ -76,10 +68,8 @@ export default async function handler(req, res) {
         CONSTRAINT valid_score_range CHECK (min_score_possible >= 0 AND max_score_possible <= 100 AND min_score_possible <= max_score_possible)
       );
     `);
-    console.log('Evaluation criteria table created successfully');
 
     // Create employee evaluations table
-    console.log('Creating employee evaluations table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS employee_evaluations (
         id SERIAL PRIMARY KEY,
@@ -102,10 +92,8 @@ export default async function handler(req, res) {
         CONSTRAINT unique_evaluation_per_employee_period_matrix UNIQUE (employee_id, evaluation_period_month, matrix_id)
       );
     `);
-    console.log('Employee evaluations table created successfully');
 
     // Create employee evaluation scores table
-    console.log('Creating employee evaluation scores table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS employee_evaluation_scores (
         id SERIAL PRIMARY KEY,
@@ -123,10 +111,8 @@ export default async function handler(req, res) {
         CONSTRAINT unique_criterion_per_evaluation UNIQUE (evaluation_id, criterion_id)
       );
     `);
-    console.log('Employee evaluation scores table created successfully');
 
     // Create self evaluations table
-    console.log('Creating self evaluations table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS self_evaluations (
         id SERIAL PRIMARY KEY,
@@ -144,10 +130,8 @@ export default async function handler(req, res) {
         CONSTRAINT unique_self_evaluation_per_employee_period_matrix UNIQUE (employee_id, evaluation_period_month, matrix_id)
       );
     `);
-    console.log('Self evaluations table created successfully');
 
     // Create self evaluation scores table
-    console.log('Creating self evaluation scores table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS self_evaluation_scores (
         id SERIAL PRIMARY KEY,
@@ -165,10 +149,8 @@ export default async function handler(req, res) {
         CONSTRAINT unique_criterion_per_self_evaluation UNIQUE (self_evaluation_id, criterion_id)
       );
     `);
-    console.log('Self evaluation scores table created successfully');
 
     // Create evaluation matrix applicability table
-    console.log('Creating evaluation matrix applicability table...');
     await client.query(`
       CREATE TABLE IF NOT EXISTS evaluation_matrix_applicability (
         id SERIAL PRIMARY KEY,
@@ -192,10 +174,8 @@ export default async function handler(req, res) {
       ON evaluation_matrix_applicability (employee_id, matrix_id) 
       WHERE status = 'active';
     `);
-    console.log('Evaluation matrix applicability table created successfully');
 
     // Create indexes
-    console.log('Creating indexes...');
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_evaluation_matrices_status ON evaluation_matrices(status);
       CREATE INDEX IF NOT EXISTS idx_evaluation_criteria_matrix_id ON evaluation_criteria(matrix_id);
@@ -214,10 +194,8 @@ export default async function handler(req, res) {
       CREATE INDEX IF NOT EXISTS idx_evaluation_matrix_applicability_employee_id ON evaluation_matrix_applicability(employee_id);
       CREATE INDEX IF NOT EXISTS idx_evaluation_matrix_applicability_status ON evaluation_matrix_applicability(status);
     `);
-    console.log('Indexes created successfully');
 
     await client.query('COMMIT');
-    console.log('All tables and indexes created successfully');
     res.status(200).json({ message: 'Tables created successfully' });
   } catch (error) {
     await client.query('ROLLBACK');

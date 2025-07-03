@@ -27,7 +27,6 @@ async function getSelectedEmployeeId(req: AuthenticatedRequest): Promise<string 
     console.warn('X-Selected-Employee-ID header not found. Operations may fail authorization.');
     return null;
   }
-  console.log(`Retrieved selectedEmployeeId: ${selectedEmployeeId} from header for criterion operations.`);
   return selectedEmployeeId; 
 }
 

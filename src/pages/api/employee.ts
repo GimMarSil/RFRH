@@ -27,15 +27,8 @@ export default async function handler(req, res) {
   const { userId } = req.query;
 
   try {
-    console.log('Attempting to connect to SQL Server with config:', {
-      server: sqlConfig.server,
-      database: sqlConfig.database,
-      user: sqlConfig.user,
-      options: sqlConfig.options
-    });
 
     await sql.connect(sqlConfig);
-    console.log('Successfully connected to SQL Server');
 
     let result;
     if (userId === "ALL") {
@@ -95,7 +88,6 @@ export default async function handler(req, res) {
       `;
     }
 
-    console.log('Query executed successfully, found', result.recordset.length, 'records');
     res.status(200).json(result.recordset);
   } catch (error) {
     console.error('Database error:', error);
