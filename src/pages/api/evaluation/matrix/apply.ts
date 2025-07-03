@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 import { pool } from '../../../../lib/db/pool';
@@ -91,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error applying matrix:', error);
+    logger.error('Error applying matrix:', error);
     res.status(500).json({ 
       message: 'Error applying matrix',
       error: error.message

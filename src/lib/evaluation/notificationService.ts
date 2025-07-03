@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -142,7 +143,7 @@ export async function runNotificationChecks() {
   try {
     await checkAndCreateNotifications();
   } catch (error) {
-    console.error('Error in notification checks:', error);
+    logger.error('Error in notification checks:', error);
     throw error;
   }
 }

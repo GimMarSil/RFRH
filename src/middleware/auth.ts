@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { InteractionRequiredAuthError } from '@azure/msal-browser';
 import { PublicClientApplication, AccountInfo } from '@azure/msal-browser';
@@ -52,7 +53,7 @@ function validateMsalConfig() {
     .map(([key]) => key);
 
   if (missingVars.length > 0) {
-    console.error('Missing required Azure AD configuration:', {
+    logger.error('Missing required Azure AD configuration:', {
       missing: missingVars,
       config: {
         ...requiredVars,
@@ -72,7 +73,7 @@ try {
   msalInstance = new PublicClientApplication(msalConfig);
   confidentialClient = new ConfidentialClientApplication(msalNodeConfig);
 } catch (error) {
-  console.error('Failed to initialize MSAL:', error);
+  logger.error('Failed to initialize MSAL:', error);
   throw error;
 }
 
@@ -106,7 +107,7 @@ async function getGraphApiToken(): Promise<string> {
 
     return result.accessToken;
   } catch (error) {
-    console.error('Error acquiring Graph API token:', error);
+    logger.error('Error acquiring Graph API token:', error);
     throw error;
   }
 }
@@ -123,7 +124,7 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
     const userId = decodedToken.oid || decodedToken.sub;
 
     if (!userId) {
-      console.error('Could not extract user ID from token');
+      logger.error('Could not extract user ID from token');
       return null;
     }
 
@@ -137,7 +138,7 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
 
     if (!response.ok) {
       const body = await response.text();
-      console.error('❌ Microsoft Graph API error:', {
+      logger.error('❌ Microsoft Graph API error:', {
         status: response.status,
         statusText: response.statusText,
         error: body,
@@ -148,7 +149,7 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
     const user = await response.json();
 
     if (!user || !user.userPrincipalName) {
-      console.error('Could not extract userPrincipalName from Graph API response for user ID:', userId);
+      logger.error('Could not extract userPrincipalName from Graph API response for user ID:', userId);
       return null;
     }
 
@@ -178,7 +179,7 @@ async function validateUserToken(token: string): Promise<{ id: string; roles: st
       roles: roles
     };
   } catch (error) {
-    console.error('Token validation error:', {
+    logger.error('Token validation error:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -196,7 +197,7 @@ export async function getUserManager(token: string): Promise<any> {
     const userId = decodedToken.oid || decodedToken.sub;
 
     if (!userId) {
-      console.error('Could not extract user ID from token');
+      logger.error('Could not extract user ID from token');
       return null;
     }
 
@@ -209,7 +210,7 @@ export async function getUserManager(token: string): Promise<any> {
 
     if (!response.ok) {
       const body = await response.text();
-      console.error('❌ Error fetching manager:', {
+      logger.error('❌ Error fetching manager:', {
         status: response.status,
         statusText: response.statusText,
         error: body,
@@ -219,7 +220,7 @@ export async function getUserManager(token: string): Promise<any> {
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching manager:', error);
+    logger.error('Error fetching manager:', error);
     return null;
   }
 }
@@ -238,7 +239,7 @@ export async function getUserDirectReports(token: string, userIdOrUpn?: string):
       const decodedUserToken = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       targetUserId = decodedUserToken.oid || decodedUserToken.sub;
       if (!targetUserId) {
-        console.error('[getUserDirectReports] Could not extract user ID from provided token when userIdOrUpn is not specified.');
+        logger.error('[getUserDirectReports] Could not extract user ID from provided token when userIdOrUpn is not specified.');
         return [];
       }
     } else {
@@ -255,7 +256,7 @@ export async function getUserDirectReports(token: string, userIdOrUpn?: string):
 
     if (!response.ok) {
       const body = await response.text();
-      console.error('❌ Error fetching direct reports:', {
+      logger.error('❌ Error fetching direct reports:', {
         status: response.status,
         statusText: response.statusText,
         error: body,
@@ -266,7 +267,7 @@ export async function getUserDirectReports(token: string, userIdOrUpn?: string):
     const data = await response.json();
     return data.value || [];
   } catch (error) {
-    console.error('Error fetching direct reports:', error);
+    logger.error('Error fetching direct reports:', error);
     return [];
   }
 }
@@ -341,7 +342,7 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: NextApiRespon
       );
 
       if (employeeCheck.length === 0) {
-        console.error('[AuthMiddleware] Employee validation FAILED. No match found for:', {
+        logger.error('[AuthMiddleware] Employee validation FAILED. No match found for:', {
           selectedEmployeeId,
           userId: userData.id,
           queryResult: employeeCheck
@@ -364,7 +365,7 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: NextApiRespon
       // Call the handler
       await handler(req, res);
     } catch (error) {
-      console.error('Authentication error in withAuth:', error);
+      logger.error('Authentication error in withAuth:', error);
       
       if (error instanceof InteractionRequiredAuthError) {
         return res.status(401).json({ 

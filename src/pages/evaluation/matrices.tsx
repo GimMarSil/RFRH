@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { PlusIcon, PencilSquareIcon, DocumentDuplicateIcon, TrashIcon, CalendarDaysIcon, ClipboardDocumentListIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useSelectedEmployee } from '../../contexts/SelectedEmployeeContext'; // Added
 import { fetchWithAuth } from '../../lib/apiClient'; // Added
+import { logger } from '@/lib/logger';
 import { InteractionStatus, type AccountInfo } from '@azure/msal-browser'; // Added for enum usage
 import { Dialog, Transition } from '@headlessui/react';
 import { useRouter } from 'next/router';
@@ -62,21 +63,21 @@ const formatDate = (dateString: string) => {
     if (!hasTimeOrUTC && /\d{4}-\d{2}-\d{2}/.test(dateString.substring(0,10))) {
       // If it looks like YYYY-MM-DD without time, append T00:00:00Z for UTC parsing
       dateToParse = dateString.substring(0,10) + 'T00:00:00Z';
-      console.log(`formatDate: Appended T00:00:00Z to ${dateString.substring(0,10)}, parsing: ${dateToParse}`);
+      logger.log(`formatDate: Appended T00:00:00Z to ${dateString.substring(0,10)}, parsing: ${dateToParse}`);
     } else {
       // If it already has T or Z, or is not in YYYY-MM-DD format, try parsing as is
-      console.log(`formatDate: Parsing as is: ${dateToParse}`);
+      logger.log(`formatDate: Parsing as is: ${dateToParse}`);
     }
 
     const date = new Date(dateToParse);
     
     if (isNaN(date.getTime())) {
-      console.error("formatDate produced Invalid Date for input:", dateString, "Parsed as:", dateToParse);
+      logger.error("formatDate produced Invalid Date for input:", dateString, "Parsed as:", dateToParse);
       return 'Data Inválida (Parse)'; // More specific error
     }
     return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   } catch (e) {
-    console.error("Error formatting date (exception):", dateString, e);
+    logger.error("Error formatting date (exception):", dateString, e);
     return 'Data Inválida (Catch)';
   }
 };
@@ -113,7 +114,7 @@ export default function EvaluationMatricesPage() {
   // Add immediate redirect if no selectedEmployeeId
   useEffect(() => {
     if (!selectedEmployeeId && !isLoading) {
-      console.log('No selected employee ID, redirecting to landing page');
+      logger.log('No selected employee ID, redirecting to landing page');
       router.replace('/landing');
     }
   }, [selectedEmployeeId, isLoading, router]);
@@ -121,7 +122,7 @@ export default function EvaluationMatricesPage() {
   // Add authentication check effect
   useEffect(() => {
     if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None) {
-      console.log('Authentication not ready:', {
+      logger.log('Authentication not ready:', {
         hasMsalInstance: !!msalInstance,
         hasActiveAccount: !!activeAccount,
         interactionStatus
@@ -130,7 +131,7 @@ export default function EvaluationMatricesPage() {
     }
 
     if (!selectedEmployeeId) {
-      console.log('No selected employee ID, redirecting to landing page');
+      logger.log('No selected employee ID, redirecting to landing page');
       router.replace('/landing');
       return;
     }
@@ -145,7 +146,7 @@ export default function EvaluationMatricesPage() {
       return;
     }
 
-    console.log('[MatricesPage] fetchMatrices called with selectedEmployeeId:', selectedEmployeeId);
+    logger.log('[MatricesPage] fetchMatrices called with selectedEmployeeId:', selectedEmployeeId);
     setIsLoading(true);
     setError(null);
 
@@ -166,7 +167,7 @@ export default function EvaluationMatricesPage() {
     } catch (err: any) {
       setError(err.message);
       toast.error(err.message);
-      console.error('[MatricesPage] Error in fetchMatrices:', err);
+      logger.error('[MatricesPage] Error in fetchMatrices:', err);
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +183,7 @@ export default function EvaluationMatricesPage() {
       setSubordinates([]);
 
       if (msalInstance && currentActiveAccount && inProgress === InteractionStatus.None && selectedEmployeeId) {
-        console.log('[MatricesPage] Attempting to fetch subordinates and manager status. Manager ID:', selectedEmployeeId);
+        logger.log('[MatricesPage] Attempting to fetch subordinates and manager status. Manager ID:', selectedEmployeeId);
         try {
           const apiClientOpts = {
             msalInstance,
@@ -198,14 +199,14 @@ export default function EvaluationMatricesPage() {
           if (roleInfo) {
             setSubordinates(roleInfo.subordinates || []);
             setIsManager(roleInfo.isManager || false); // Store isManager
-            console.log('[MatricesPage] Fetched user role info:', {isManager: roleInfo.isManager, numSubordinates: roleInfo.subordinates?.length });
+            logger.log('[MatricesPage] Fetched user role info:', {isManager: roleInfo.isManager, numSubordinates: roleInfo.subordinates?.length });
           } else {
             setSubordinates([]);
             setIsManager(false);
-            console.log('[MatricesPage] No roleInfo received.');
+            logger.log('[MatricesPage] No roleInfo received.');
           }
         } catch (err: any) {
-          console.error('Failed to fetch subordinates/manager status:', err);
+          logger.error('Failed to fetch subordinates/manager status:', err);
           toast.error('Falha ao buscar lista de subordinados e status de gestor.');
           setSubordinates([]);
           setIsManager(false);
@@ -217,7 +218,7 @@ export default function EvaluationMatricesPage() {
   }, [msalInstance, accounts, inProgress, selectedEmployeeId]);
 
   useEffect(() => {
-    console.log('[MatricesPage] useEffect for fetching matrices triggered. Values:', {
+    logger.log('[MatricesPage] useEffect for fetching matrices triggered. Values:', {
         hasMsalInstance: !!msalInstance,
         accountsLength: accounts?.length,
         inProgressStatus: inProgress,
@@ -226,7 +227,7 @@ export default function EvaluationMatricesPage() {
 
     // 1. Wait for MSAL instance and for inProgress to be defined and not in startup/redirect phase.
     if (!msalInstance || inProgress === undefined || inProgress === InteractionStatus.Startup || inProgress === InteractionStatus.HandleRedirect) {
-        console.log('[MatricesPage] Waiting for MSAL initialization or redirect/startup to complete. isLoading remains true.');
+        logger.log('[MatricesPage] Waiting for MSAL initialization or redirect/startup to complete. isLoading remains true.');
         // setIsLoading(true); // Implicitly, isLoading is true initially or from previous state
         return; // Exit and wait for these dependencies to change and re-trigger useEffect
     }
@@ -237,10 +238,10 @@ export default function EvaluationMatricesPage() {
     // 2. Check if interaction is None (i.e., idle and ready)
     if (inProgress === InteractionStatus.None) {
         if (currentActiveAccount && selectedEmployeeId) {
-            console.log('[MatricesPage] Conditions fully met (MSAL Ready, InteractionStatus.None, Account, EmployeeID). Calling fetchMatrices().');
+            logger.log('[MatricesPage] Conditions fully met (MSAL Ready, InteractionStatus.None, Account, EmployeeID). Calling fetchMatrices().');
             fetchMatrices();
         } else {
-            console.log('[MatricesPage] MSAL Ready and InteractionStatus is None, but ActiveAccount or SelectedEmployeeId is missing. Not fetching.');
+            logger.log('[MatricesPage] MSAL Ready and InteractionStatus is None, but ActiveAccount or SelectedEmployeeId is missing. Not fetching.');
             setIsLoading(false); // Can stop loading as we won't fetch under these conditions
             if (!currentActiveAccount && msalInstance) { 
                 setError("Login necessário ou nenhuma conta ativa encontrada.");
@@ -251,7 +252,7 @@ export default function EvaluationMatricesPage() {
     } else {
         // Interaction is in progress (e.g., login, acquireToken) but not startup/redirect/undefined.
         // This means user interaction might be required or is ongoing.
-        console.log(`[MatricesPage] MSAL interaction is currently '${inProgress}'. Waiting for it to resolve to 'None'. isLoading remains true.`);
+        logger.log(`[MatricesPage] MSAL interaction is currently '${inProgress}'. Waiting for it to resolve to 'None'. isLoading remains true.`);
         // setIsLoading(true); // Keep loading, as we are actively waiting for an MSAL process
     }
      // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -278,7 +279,7 @@ export default function EvaluationMatricesPage() {
 
     if (!matrixId || matrixId === "undefined") {
       toast.error("ID da Matriz inválido para edição.");
-      console.error("[MatricesPage] handleEditMatrix: ID da matriz inválido:", matrixToEdit);
+      logger.error("[MatricesPage] handleEditMatrix: ID da matriz inválido:", matrixToEdit);
       setIsLoading(false);
       return;
     }
@@ -294,7 +295,7 @@ export default function EvaluationMatricesPage() {
         setEditingMatrix(matrixToEdit);
         setShowFormModal(true);
     } catch (err: any) {
-        console.error('[MatricesPage] Error fetching matrix for edit:', err);
+        logger.error('[MatricesPage] Error fetching matrix for edit:', err);
         toast.error(err.message);
         setError(err.message); // Set page error if needed, or rely on toast
     } finally {
@@ -335,7 +336,7 @@ export default function EvaluationMatricesPage() {
       return matrix?.applicable_employee_ids || [];
 
     } catch (error: any) {
-      console.error(`Error fetching applicability for matrix ${matrixId}:`, error);
+      logger.error(`Error fetching applicability for matrix ${matrixId}:`, error);
       toast.error(`Falha ao buscar aplicabilidade para a matriz ${matrixId}.`);
       return [];
     }
@@ -352,7 +353,7 @@ export default function EvaluationMatricesPage() {
 
     setIsLoading(true);
     if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None) {
-      console.error('[MatricesPage] handleSaveMatrix: Prerequisites for fetchWithAuth not met.');
+      logger.error('[MatricesPage] handleSaveMatrix: Prerequisites for fetchWithAuth not met.');
       toast.error("Não é possível salvar a matriz: contexto de autenticação inválido.");
       setIsLoading(false);
       return;
@@ -366,7 +367,7 @@ export default function EvaluationMatricesPage() {
       criteria: data.criteria.map(c => ({ ...c, weight: Number(c.weight) || 0 })),
     };
     
-    console.log('[MatricesPage] Saving matrix with data:', processedData);
+    logger.log('[MatricesPage] Saving matrix with data:', processedData);
 
     try {
       const apiClientOpts = {
@@ -376,7 +377,7 @@ export default function EvaluationMatricesPage() {
         selectedEmployeeId,
       };
       
-      console.log('[MatricesPage] handleSaveMatrix - Preparing to call fetchWithAuth. apiClientOpts:', {
+      logger.log('[MatricesPage] handleSaveMatrix - Preparing to call fetchWithAuth. apiClientOpts:', {
         msalInstanceExists: !!apiClientOpts.msalInstance,
         interactionStatus: apiClientOpts.interactionStatus,
         activeAccountExists: !!apiClientOpts.activeAccount,
@@ -398,7 +399,7 @@ export default function EvaluationMatricesPage() {
     } catch (err: any) {
       setError(err.message);
       toast.error(err.message);
-      console.error('[MatricesPage] Error saving matrix:', err);
+      logger.error('[MatricesPage] Error saving matrix:', err);
     } finally {
       setIsLoading(false);
     }
@@ -406,7 +407,7 @@ export default function EvaluationMatricesPage() {
 
   const handleDeleteMatrix = async (matrixIdToDelete?: string) => {
     if (!matrixIdToDelete || matrixIdToDelete === "undefined") {
-      console.error("[handleDeleteMatrix] ID da matriz é inválido ou não fornecido:", matrixIdToDelete);
+      logger.error("[handleDeleteMatrix] ID da matriz é inválido ou não fornecido:", matrixIdToDelete);
       toast.error("Erro ao inativar matriz: ID inválido.");
       setIsLoading(false); // Ensure loading state is reset
       return;
@@ -418,7 +419,7 @@ export default function EvaluationMatricesPage() {
 
     setIsLoading(true); // Set loading true only after confirmation and ID check
     if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None || !selectedEmployeeId) {
-      console.error('[MatricesPage] handleDeleteMatrix: Prerequisites for fetchWithAuth not met.');
+      logger.error('[MatricesPage] handleDeleteMatrix: Prerequisites for fetchWithAuth not met.');
       toast.error("Não é possível inativar a matriz: contexto de autenticação inválido.");
       setIsLoading(false);
       return;
@@ -441,7 +442,7 @@ export default function EvaluationMatricesPage() {
     } catch (err: any) {
       setError(err.message);
       toast.error(err.message);
-      console.error('[MatricesPage] Error deleting (inactivating) matrix:', err);
+      logger.error('[MatricesPage] Error deleting (inactivating) matrix:', err);
     } finally {
       setIsLoading(false);
     }
@@ -449,7 +450,7 @@ export default function EvaluationMatricesPage() {
 
   const handleCopyMatrix = async (matrixToCopy: EvaluationMatrix) => {
     if (!msalInstance || !activeAccount || interactionStatus !== InteractionStatus.None || !selectedEmployeeId) {
-      console.error('[MatricesPage] handleCopyMatrix: Prerequisites for fetchWithAuth not met.');
+      logger.error('[MatricesPage] handleCopyMatrix: Prerequisites for fetchWithAuth not met.');
       toast.error("Não é possível copiar a matriz: contexto de autenticação inválido.");
       return;
     }
@@ -457,7 +458,7 @@ export default function EvaluationMatricesPage() {
     // Ensure matrixToCopy has a valid ID before attempting to use its properties
     const idToCopyFrom = matrixToCopy.id || matrixToCopy.matrix_id;
     if (!idToCopyFrom) {
-        console.error("[MatricesPage] handleCopyMatrix: Matriz original não tem ID para copiar.", matrixToCopy);
+        logger.error("[MatricesPage] handleCopyMatrix: Matriz original não tem ID para copiar.", matrixToCopy);
         toast.error("Erro ao copiar: Matriz original sem ID.");
         return;
     }
@@ -479,7 +480,7 @@ export default function EvaluationMatricesPage() {
       ? newMatrixData.criteria.map(c => ({ ...c, id: undefined }))
       : [];
 
-    console.log('[MatricesPage] Attempting to save copied matrix:', newMatrixData);
+    logger.log('[MatricesPage] Attempting to save copied matrix:', newMatrixData);
     setShowFormModal(true);
     setEditingMatrix(newMatrixData); // Open form with copied data for potential edits before saving
     setSelectedApplicableEmployees(newMatrixData.applicable_employee_ids || []);
@@ -509,7 +510,7 @@ export default function EvaluationMatricesPage() {
     } catch (err: any) {
       setError(err.message);
       toast.error(`Erro ao copiar matriz: ${err.message}`);
-      console.error('[MatricesPage] Error copying matrix:', err);
+      logger.error('[MatricesPage] Error copying matrix:', err);
     } finally {
       setIsLoading(false);
     }
@@ -519,7 +520,7 @@ export default function EvaluationMatricesPage() {
   const handleShowApplications = async (matrix: EvaluationMatrix) => {
     const matrixIdToShow = matrix.id || matrix.matrix_id;
     if (!matrixIdToShow || matrixIdToShow === "undefined") {
-      console.error("[MatricesPage] handleShowApplications: ID da matriz inválido:", matrix);
+      logger.error("[MatricesPage] handleShowApplications: ID da matriz inválido:", matrix);
       toast.error("Erro ao ver aplicações: ID da matriz inválido.");
       return;
     }
@@ -730,7 +731,7 @@ export default function EvaluationMatricesPage() {
                           if (idToDel && idToDel !== "undefined") {
                             handleDeleteMatrix(idToDel);
                           } else {
-                            console.error("ID inválido no botão Apagar:", matrix);
+                            logger.error("ID inválido no botão Apagar:", matrix);
                             toast.error("Erro: ID da matriz inválido para apagar.");
                           }
                         }}

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 import fs from 'fs';
 import path from 'path';
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error creating evaluation schema:', error);
+    logger.error('Error creating evaluation schema:', error);
     res.status(500).json({ 
       success: false, 
       error: error.message,

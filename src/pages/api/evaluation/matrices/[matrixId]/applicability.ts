@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import { canAccessMatrix, canManageMatrix } from '../../../../../lib/evaluation/auth';
@@ -23,7 +24,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 
@@ -69,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ message: 'Forbidden: Selected Employee ID required for matrix operations.' });
     }
   } catch (authError) {
-    console.error('Authentication error in matrices API:', authError);
+    logger.error('Authentication error in matrices API:', authError);
     return res.status(500).json({ message: 'Authentication failed.' });
   }
 
@@ -101,7 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         return res.status(200).json(result.rows);
       } catch (error) {
-        console.error('Error fetching matrix applicability:', error);
+        logger.error('Error fetching matrix applicability:', error);
         return res.status(500).json({ message: 'Error fetching matrix applicability', error: error.message });
       }
     } else if (method === 'POST') {
@@ -166,7 +167,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(updatedResult.rows);
       } catch (error) {
         await client.query('ROLLBACK');
-        console.error('Error updating matrix applicability:', error);
+        logger.error('Error updating matrix applicability:', error);
         return res.status(500).json({ message: 'Error updating matrix applicability', error: error.message });
       }
     } else if (method === 'DELETE') {
@@ -191,7 +192,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json({ message: 'Matrix applicability removed successfully' });
       } catch (error) {
         await client.query('ROLLBACK');
-        console.error('Error removing matrix applicability:', error);
+        logger.error('Error removing matrix applicability:', error);
         return res.status(500).json({ message: 'Error removing matrix applicability', error: error.message });
       }
     } else {
@@ -199,7 +200,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (error) {
-    console.error('General API handler error in matrices API:', error);
+    logger.error('General API handler error in matrices API:', error);
     return res.status(500).json({ message: 'An unexpected error occurred', error: error.message });
   } finally {
     client.release();

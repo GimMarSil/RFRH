@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 
@@ -22,7 +23,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 
@@ -54,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ message: 'Unauthorized: System User ID not available.' });
     }
   } catch (authError) {
-    console.error('MATRIX_CRITERIA_API: Authentication error:', authError);
+    logger.error('MATRIX_CRITERIA_API: Authentication error:', authError);
     return res.status(500).json({ message: 'Authentication failed.' });
   }
 
@@ -103,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       } catch (dbError) {
         await client.query('ROLLBACK');
-        console.error(`MATRIX_CRITERIA_API: Error creating criterion for matrix ${matrixId}:`, dbError);
+        logger.error(`MATRIX_CRITERIA_API: Error creating criterion for matrix ${matrixId}:`, dbError);
         if (dbError.code === '23505') { 
             return res.status(409).json({ message: `A criterion with the name '${req.body.name}' already exists for this matrix.`, code: dbError.code });
         } else if (dbError.message && dbError.message.includes('Criteria weights for matrix_id')) { 
@@ -118,7 +119,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const criteriaResult = await client.query('SELECT * FROM evaluation_criteria WHERE matrix_id = $1 ORDER BY name', [matrixId]);
         return res.status(200).json(criteriaResult.rows);
       } catch (dbError) {
-        console.error(`MATRIX_CRITERIA_API: Error fetching criteria for matrix ${matrixId}:`, dbError);
+        logger.error(`MATRIX_CRITERIA_API: Error fetching criteria for matrix ${matrixId}:`, dbError);
         return res.status(500).json({ message: `Error fetching criteria for matrix ${matrixId}`, error: dbError.message });
       }
     }else {
@@ -126,7 +127,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(405).end(`Method ${method} Not Allowed for this route.`);
     }
   } catch (error) {
-    console.error('MATRIX_CRITERIA_API: General API handler error:', error);
+    logger.error('MATRIX_CRITERIA_API: General API handler error:', error);
     if (!res.headersSent) {
       return res.status(500).json({ message: 'An unexpected error occurred in criteria API.', error: error.message });
     }

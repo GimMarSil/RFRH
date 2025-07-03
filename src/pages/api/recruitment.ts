@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -7,7 +8,7 @@ const pool = new Pool({
 
 // Test connection on startup
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  logger.error('Unexpected error on idle client', err);
   process.exit(-1);
 });
 
@@ -46,8 +47,8 @@ export default async function handler(req, res) {
         }
         return res.status(200).json(pedido);
       } catch (error) {
-        console.error('Erro ao buscar pedido:', error);
-        console.error('Connection string:', process.env.DATABASE_URL ? 'Defined' : 'Not defined');
+        logger.error('Erro ao buscar pedido:', error);
+        logger.error('Connection string:', process.env.DATABASE_URL ? 'Defined' : 'Not defined');
         return res.status(500).json({ message: 'Erro ao buscar pedido', error: error.message });
       }
     }
@@ -61,9 +62,9 @@ export default async function handler(req, res) {
       );
       return res.status(200).json(result.rows);
     } catch (error) {
-      console.error('Erro ao buscar pedidos de recrutamento:', error);
-      console.error('Connection string:', process.env.DATABASE_URL ? 'Defined' : 'Not defined');
-      console.error('Error details:', {
+      logger.error('Erro ao buscar pedidos de recrutamento:', error);
+      logger.error('Connection string:', process.env.DATABASE_URL ? 'Defined' : 'Not defined');
+      logger.error('Error details:', {
         code: error.code,
         message: error.message,
         stack: error.stack
@@ -139,7 +140,7 @@ export default async function handler(req, res) {
       );
       res.status(200).json({ success: true, id: result.rows[0].id });
     } catch (error) {
-      console.error('Erro ao gravar recrutamento:', error);
+      logger.error('Erro ao gravar recrutamento:', error);
       res.status(500).json({ success: false, error: error.message });
     }
   } else if (req.method === 'PUT') {
@@ -196,7 +197,7 @@ export default async function handler(req, res) {
       );
       res.status(200).json({ success: true, data: result.rows[0] });
     } catch (error) {
-      console.error('Erro ao atualizar pedido:', error);
+      logger.error('Erro ao atualizar pedido:', error);
       res.status(500).json({ success: false, error: error.message });
     }
   } else {

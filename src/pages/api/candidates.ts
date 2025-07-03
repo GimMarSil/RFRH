@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -6,7 +7,7 @@ const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  logger.error('Unexpected error on idle client', err);
   process.exit(-1);
 });
 
@@ -20,7 +21,7 @@ async function checkUserAuthorization(req): Promise<{ authorized: boolean; userI
   try {
     userGroups = JSON.parse(req.headers['x-user-groups'] || '[]');
   } catch (e) {
-    console.error("Error parsing user groups:", e);
+    logger.error("Error parsing user groups:", e);
   }
 
   if (!userId) {
@@ -62,7 +63,7 @@ export default async function handler(req, res) {
       return res.status(200).json(result.rows);
 
     } catch (error) {
-      console.error('Erro ao buscar candidatos:', error);
+      logger.error('Erro ao buscar candidatos:', error);
       return res.status(500).json({ message: 'Erro ao buscar candidatos', error: error.message });
     }
   } else if (req.method === 'POST') {
@@ -147,14 +148,14 @@ export default async function handler(req, res) {
           null          // No old_data for creation
         ]);
       } catch (logError) {
-        console.error('Failed to log candidate creation:', logError);
+        logger.error('Failed to log candidate creation:', logError);
         // Optionally, decide if a logging failure should affect the main response
       }
 
       return res.status(201).json(newCandidate);
 
     } catch (error) {
-      console.error('Erro ao criar candidato:', error);
+      logger.error('Erro ao criar candidato:', error);
       // Check for unique constraint violation for email (example)
       if (error.code === '23505' && error.constraint && error.constraint.includes('email')) {
         return res.status(409).json({ message: 'Erro ao criar candidato: O email fornecido já existe.', error: error.message });

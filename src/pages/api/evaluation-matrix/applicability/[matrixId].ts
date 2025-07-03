@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 
@@ -31,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(result.rows);
   } catch (error) {
-    console.error('Error fetching matrix applicability:', error);
+    logger.error('Error fetching matrix applicability:', error);
     return res.status(500).json({ message: 'Internal server error' });
   } finally {
     client.release();

@@ -1,4 +1,5 @@
 import { IPublicClientApplication, InteractionRequiredAuthError, InteractionStatus, AccountInfo } from "@azure/msal-browser";
+import { logger } from '@/lib/logger';
 
 // This should match the API scopes defined in your MSAL configuration and frontend components.
 const apiScopes = [process.env.NEXT_PUBLIC_API_SCOPES || "api://YOUR_BACKEND_APP_ID_URI/.default"];
@@ -30,7 +31,7 @@ export async function fetchWithAuth<T = any>(
   const { msalInstance, interactionStatus, activeAccount, selectedEmployeeId } = options;
 
   if (!msalInstance || !activeAccount) {
-    console.error('[apiClient] MSAL instance or active account is missing. Cannot proceed with authenticated request.', { msalInstanceExists: !!msalInstance, activeAccountExists: !!activeAccount });
+    logger.error('[apiClient] MSAL instance or active account is missing. Cannot proceed with authenticated request.', { msalInstanceExists: !!msalInstance, activeAccountExists: !!activeAccount });
     // For GET requests, we might have previously allowed them to proceed,
     // but protected GET endpoints will fail. It's better to stop here.
     return Promise.reject(new Error('Authentication context not available.'));
@@ -43,13 +44,13 @@ export async function fetchWithAuth<T = any>(
 
   let tokenResponse;
 
-  console.log(`[apiClient] fetchWithAuth attempting for URL: ${apiUrl}, Method: ${requestOptions.method}`);
-  console.log('[apiClient] Options:', { interactionStatus, selectedEmployeeId, activeAccountUsername: activeAccount.username });
+  logger.log(`[apiClient] fetchWithAuth attempting for URL: ${apiUrl}, Method: ${requestOptions.method}`);
+  logger.log('[apiClient] Options:', { interactionStatus, selectedEmployeeId, activeAccountUsername: activeAccount.username });
 
   try {
     if (interactionStatus === InteractionStatus.None) {
       tokenResponse = await msalInstance.acquireTokenSilent(request);
-      console.log(`[apiClient] Token acquired silently for ${apiUrl}:`, tokenResponse ? 'Token obtained' : 'Token NOT obtained');
+      logger.log(`[apiClient] Token acquired silently for ${apiUrl}:`, tokenResponse ? 'Token obtained' : 'Token NOT obtained');
     } else {
       console.warn(`[apiClient] Interaction in progress (${interactionStatus}), skipping silent token acquisition for ${apiUrl}. This might lead to auth failure if a redirect/popup isn't completing.`);
       // Decide if we should attempt acquireTokenRedirect/Popup here or if the main app flow handles it.
@@ -57,9 +58,9 @@ export async function fetchWithAuth<T = any>(
       // This situation (interaction in progress) should ideally resolve before making API calls.
     }
   } catch (error) {
-    console.error(`[apiClient] Silent token acquisition failed for ${apiUrl}:`, error);
+    logger.error(`[apiClient] Silent token acquisition failed for ${apiUrl}:`, error);
     if (error instanceof InteractionRequiredAuthError) {
-      console.log(`[apiClient] Interaction required for ${apiUrl}. Depending on app flow, redirect/popup should be invoked.`);
+      logger.log(`[apiClient] Interaction required for ${apiUrl}. Depending on app flow, redirect/popup should be invoked.`);
       // msalInstance.acquireTokenRedirect(request); // Or acquireTokenPopup
       // For now, let API call fail to indicate an issue with interaction handling.
     }
@@ -80,7 +81,7 @@ export async function fetchWithAuth<T = any>(
 
   if (tokenResponse && tokenResponse.accessToken) {
     headers.append('Authorization', `Bearer ${tokenResponse.accessToken}`);
-    console.log(`[apiClient] Authorization header added for ${apiUrl}. Token snippet: ${tokenResponse.accessToken.substring(0, 20)}...`);
+    logger.log(`[apiClient] Authorization header added for ${apiUrl}. Token snippet: ${tokenResponse.accessToken.substring(0, 20)}...`);
   } else {
     console.warn(`[apiClient] No access token available for ${apiUrl}. Proceeding without Authorization header. This will likely fail for protected routes.`);
     // For GET requests, we used to let them pass, but now we are stricter.
@@ -88,7 +89,7 @@ export async function fetchWithAuth<T = any>(
     // this branch means the header isn't even being added.
   }
   
-  console.log(`[apiClient] Headers being sent for ${apiUrl}:`, Array.from(headers.entries()));
+  logger.log(`[apiClient] Headers being sent for ${apiUrl}:`, Array.from(headers.entries()));
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''; // e.g., http://localhost:3000
 
@@ -99,7 +100,7 @@ export async function fetchWithAuth<T = any>(
     });
 
     if (apiUrl.includes('activeMatrixCheck')) {
-      console.log(`[apiClient] Response status for activeMatrixCheck (${apiUrl}): ${response.status}`);
+      logger.log(`[apiClient] Response status for activeMatrixCheck (${apiUrl}): ${response.status}`);
     }
 
     if (!response.ok) {
@@ -130,7 +131,7 @@ export async function fetchWithAuth<T = any>(
     }
   } catch (error) {
     // Log network errors or errors during fetch/json parsing
-    console.error(`[apiClient] Fetch or JSON parsing error for ${apiUrl}:`, error);
+    logger.error(`[apiClient] Fetch or JSON parsing error for ${apiUrl}:`, error);
     // Re-throw the error so the calling function can handle it
     // If it's already our custom error object, just rethrow it.
     if (error && typeof error === 'object' && 'status' in error) throw error;
@@ -155,7 +156,7 @@ function MyComponent() {
 
   const handleFetchData = async () => {
     if (accounts.length === 0) {
-      console.error("No user signed in.");
+      logger.error("No user signed in.");
       // Potentially trigger login or show a message
       return;
     }
@@ -174,7 +175,7 @@ function MyComponent() {
         { method: "GET" }, 
         clientOptions
       );
-      console.log("Fetched data:", data);
+      logger.log("Fetched data:", data);
 
       // Example POST request
       // const postData = { name: "Test" };
@@ -186,13 +187,13 @@ function MyComponent() {
       //   },
       //   clientOptions
       // );
-      // console.log("POST response:", response);
+      // logger.log("POST response:", response);
 
     } catch (error: any) {
-      console.error("API call failed:", error);
+      logger.error("API call failed:", error);
       if (error instanceof InteractionRequiredAuthError) {
         // Handle interaction required error (e.g., by redirecting or showing a popup)
-        // instance.acquireTokenRedirect(tokenRequest).catch(console.error);
+        // instance.acquireTokenRedirect(tokenRequest).catch(logger.error);
       } else {
         // Handle other errors (e.g., display a notification to the user)
         // alert(`Error: ${error.message}`);

@@ -3,6 +3,7 @@ import { useForm, useFieldArray, Controller, SubmitHandler } from 'react-hook-fo
 import { message } from 'antd';
 import { useSelectedEmployee } from '../../contexts/SelectedEmployeeContext';
 import { fetchWithAuth, type ApiClientOptions } from '../../lib/apiClient';
+import { logger } from '@/lib/logger';
 import { InteractionStatus } from '@azure/msal-browser';
 
 // Re-using types from matrices.tsx for now, ideally share them
@@ -122,17 +123,17 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
         );
         setSubordinatesWithActiveMatrix((data?.activeEmployeeIds || []).map(String));
       } catch (error) {
-        console.error('Erro ao verificar matrizes ativas:', error);
+        logger.error('Erro ao verificar matrizes ativas:', error);
       }
     };
     fetchActiveMatrixForSubs();
   }, [subordinatesList, msalInstance, activeAccount, interactionStatus, currentSelectedEmployeeId]);
 
   // Debug logs para garantir tipos corretos
-  console.log('subordinatesWithActiveMatrix:', subordinatesWithActiveMatrix);
-  console.log('typeof subordinatesWithActiveMatrix[0]:', typeof subordinatesWithActiveMatrix[0]);
-  console.log('subordinatesList ids:', subordinatesList?.map(s => s.id));
-  console.log('typeof subordinatesList[0].id:', typeof subordinatesList?.[0]?.id);
+  logger.log('subordinatesWithActiveMatrix:', subordinatesWithActiveMatrix);
+  logger.log('typeof subordinatesWithActiveMatrix[0]:', typeof subordinatesWithActiveMatrix[0]);
+  logger.log('subordinatesList ids:', subordinatesList?.map(s => s.id));
+  logger.log('typeof subordinatesList[0].id:', typeof subordinatesList?.[0]?.id);
 
   // Handle subordinate selection change for checkboxes
   const handleSubordinateSelection = (subordinateId: string | number) => {
@@ -189,7 +190,7 @@ const MatrixForm: React.FC<MatrixFormProps> = ({ matrix, onClose, onSave, subord
       // Error handling is done in handleSaveMatrix, which uses toast.error(err.message)
       // If MatrixForm needs its own specific error display beyond what onSave does, add it here.
       // For now, assume onSave's error handling is sufficient.
-      console.error("[MatrixForm] onSubmit: Error during onSave call:", error);
+      logger.error('[MatrixForm] onSubmit: Error during onSave call:', error);
       // message.error("Falha ao salvar a matriz a partir do formulário."); // Avoid double toasting if onSave also toasts
     }
   };

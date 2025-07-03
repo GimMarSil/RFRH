@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Pool } from 'pg';
 import fs from 'fs';
@@ -224,7 +225,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ message: 'Tables created successfully' });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error creating tables:', error);
+    logger.error('Error creating tables:', error);
     res.status(500).json({ 
       message: 'Error creating tables',
       error: error.message,

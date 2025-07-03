@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Pool } from 'pg';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllActiveEmployees, getEmployeeDetailsByUserId, getEmployeeDetailsByNumber } from '../../../lib/employeeDbService';
@@ -46,7 +47,7 @@ async function getAuthenticatedSystemUserId(req: NextApiRequest): Promise<string
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded.oid || decoded.sub || decoded.userPrincipalName || decoded.upn || null;
     } catch (err) {
-      console.error('Failed to decode authorization token', err);
+      logger.error('Failed to decode authorization token', err);
     }
   }
 
@@ -145,7 +146,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
           finalParams = [false, allowedCreatorUpns]; // $1=isAdmin (false), $2=array of allowed UPNs
 
         } catch (graphError) {
-          console.error('Failed to fetch direct reports from Graph API:', graphError);
+          logger.error('Failed to fetch direct reports from Graph API:', graphError);
           return res.status(500).json({ message: 'Failed to retrieve subordinate data for matrix filtering.', details: graphError.message });
         }
       }
@@ -183,7 +184,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
 
       const validationResult = await validateMatrixInput(req.body);
       if (!validationResult.success) {
-        console.error('[API POST Matrix] Input validation failed:', validationResult.errors);
+        logger.error('[API POST Matrix] Input validation failed:', validationResult.errors);
         return res.status(400).json({ message: 'Invalid input', errors: validationResult.errors });
       }
 
@@ -214,7 +215,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
           authorizedSubordinateEmployeeNumbers = subordinatesQuery.rows.map(r => r.employee_number.toString());
         }
       } catch (graphError) {
-        console.error('[POST Matrix Auth] Failed to fetch direct reports from Graph API:', graphError);
+        logger.error('[POST Matrix Auth] Failed to fetch direct reports from Graph API:', graphError);
         return res.status(500).json({ message: 'Failed to retrieve subordinate data for authorization.', details: graphError.message });
       }
 
@@ -313,7 +314,7 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise
     if (client) {
       await client.query('ROLLBACK');
     }
-    console.error('Error in matrices API:', error);
+    logger.error('Error in matrices API:', error);
     // Check for specific error types if needed, e.g., error.code for pg errors
     if (error.code === '23505') { // Unique violation
         res.status(409).json({ message: 'Conflict: A similar record already exists.', details: error.detail });
